@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>保險配置建議工作台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f3ef; --surface:#fcfcfb; --white:#fff; --ink:#141414; --ink2:#52514e; --muted:#8a8984;
+  --line:#e3e1db; --line2:#d3d0c8; --soft:#efeee9;
+  --crimson:#9b1c25; --crimson-soft:#f7ecec;
+  --good:#0ca30c; --warning:#fab219; --critical:#d03b3b;
+  --font:"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{text-wrap:balance} p{text-wrap:pretty}
+.app{max-width:720px;margin:0 auto;padding:0 16px 96px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 6px}
+.top h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+.top .eyebrow{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.top select{border:1px solid var(--line2);background:var(--white);border-radius:8px;padding:7px 10px;font-size:13.5px}
+.label{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin:18px 2px 8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+
+/* input */
+.input-card{padding:0;overflow:hidden}
+textarea#story{display:block;width:100%;min-height:118px;border:0;resize:vertical;padding:14px 16px 6px;font-size:16px;line-height:1.65;background:var(--white);outline:none}
+.input-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-top:1px solid var(--line)}
+.mic{display:flex;align-items:center;gap:8px;border:0;background:var(--ink);color:#fff;border-radius:999px;padding:9px 18px 9px 14px;font-size:15px;font-weight:600;cursor:pointer;min-height:44px}
+.mic svg{width:20px;height:20px}
+.mic.on{background:var(--crimson)}
+.mic.on rect{animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.ghost{border:1px solid var(--line2);background:var(--white);border-radius:999px;padding:8px 14px;font-size:13.5px;cursor:pointer;min-height:40px}
+.hint{font-size:12.5px;color:var(--muted);margin:8px 4px 0}
+.parsed{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pchip{font-size:13px;border-radius:999px;padding:3px 10px;background:var(--ink);color:#fff}
+.pchip.miss{background:transparent;color:var(--ink2);border:1px dashed var(--line2)}
+.miss-lab{font-size:12.5px;color:var(--ink2);width:100%;margin-top:4px}
+
+/* quick controls */
+.qrow + .qrow{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:13.5px;font-weight:600}
+.qhead .val{font-size:20px;font-weight:700}
+.qhead .val small{font-size:12.5px;color:var(--ink2);font-weight:500;margin-left:2px}
+input[type=range]{width:100%;accent-color:var(--ink);height:28px}
+.range-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.linkbtn{border:0;background:none;padding:4px 0;font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.seg{display:flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:var(--white);min-height:42px}
+.seg label{flex:1;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border-right:1px solid var(--line);color:var(--ink2);margin:0;text-align:center;padding:0 4px}
+.seg label:last-child{border-right:0}
+.seg input{display:none}
+.seg label:has(input:checked){background:var(--ink);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line2);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer;background:var(--white);color:var(--ink2);user-select:none;min-height:36px;display:inline-flex;align-items:center}
+.chip input{display:none}
+.chip:has(input:checked){background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* details form */
+details.more{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+details.more>summary{list-style:none;cursor:pointer;padding:12px 16px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"＋";color:var(--muted);font-weight:400}
+details.more[open]>summary::after{content:"－"}
+.more-body{padding:0 16px 16px}
+.grp{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 8px}
+.grp:first-child{margin-top:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:4px}
+.field input,.field select{width:100%;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;background:var(--white);font-size:16px;min-height:42px}
+.unit{position:relative}.unit input{padding-right:40px}
+.unit span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12.5px;color:var(--muted);pointer-events:none}
+.check{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink2);cursor:pointer;min-height:36px}
+.check input{width:18px;height:18px;accent-color:var(--ink)}
+
+/* hero */
+.hero{margin-top:26px;padding-top:18px;border-top:2px solid var(--ink)}
+.hero .who{font-size:13.5px;color:var(--ink2)}
+.hero .big{display:flex;align-items:baseline;gap:8px;margin:4px 0 12px}
+.hero .big b{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.hero .big span{font-size:14px;color:var(--ink2)}
+.stack{display:flex;gap:2px;height:16px;border-radius:5px;overflow:hidden;background:var(--soft)}
+.stack i{display:block;height:100%;cursor:pointer;transition:opacity .15s}
+.stack.dim i{opacity:.3}.stack.dim i.on{opacity:1}
+.stack-cap{font-size:13px;color:var(--ink2);margin-top:8px;min-height:20px}
+.stack-cap b{color:var(--ink)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.mini div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--ink2)}
+.mini b{display:flex;align-items:center;gap:6px;font-size:17px;color:var(--ink);margin-top:1px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+
+/* tabs */
+.tabs{position:sticky;top:0;z-index:15;background:rgba(244,243,239,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);margin:18px -16px 12px;padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:4px}
+.tabs button{flex:1;border:0;background:none;padding:9px 0;border-radius:8px;font-size:14.5px;font-weight:600;color:var(--ink2);cursor:pointer;position:relative;min-height:40px}
+.tabs button.on{background:var(--ink);color:#fff}
+.tabs button .bdg{position:absolute;top:6px;right:calc(50% - 22px);width:7px;height:7px;border-radius:50%;background:var(--crimson)}
+.panel{display:none}.panel.on{display:block}
+
+/* product rows */
+.prow{background:var(--white);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.prow.off{background:var(--bg)}
+.prow.off .ph{opacity:.5}
+.ph{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.ph .main{flex:1;min-width:0}
+.ph .nm{display:flex;align-items:center;gap:7px;font-weight:700;font-size:15px}
+.ph .sub{font-size:12.5px;color:var(--muted);margin-top:1px}
+.ph .amt{text-align:right;font-size:12px;color:var(--muted);white-space:nowrap}
+.ph .amt b{display:block;font-size:16px;color:var(--ink)}
+.tgl{position:relative;width:44px;height:26px;flex:none}
+.tgl input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:2}
+.tgl span{position:absolute;inset:0;border-radius:999px;background:var(--line2);transition:background .15s}
+.tgl span::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.tgl input:checked+span{background:var(--ink)}
+.tgl input:checked+span::after{transform:translateX(18px)}
+.pbody{display:none;padding:0 14px 13px 14px;font-size:13.5px;color:var(--ink2)}
+.prow.open .pbody{display:block}
+.pbody p{margin:0}
+.chev{width:16px;height:16px;flex:none;color:var(--muted);transition:transform .15s}
+.prow.open .chev{transform:rotate(180deg)}
+.tag{font-size:11px;border-radius:4px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.tag.p1{background:var(--ink);color:#fff}.tag.p2{background:var(--soft);color:var(--ink)}.tag.p3{border:1px solid var(--line2);color:var(--ink2)}.tag.def{border:1px dashed var(--muted);color:var(--ink2)}
+.svc-line{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:13px;display:flex;gap:8px}
+.svc-line svg{flex:none;width:16px;height:16px;margin-top:2px;stroke:var(--crimson)}
+.svc-line b{color:var(--ink)}
+.note-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--ink2);background:var(--surface);border:1px dashed var(--line2);border-radius:10px;padding:10px 12px;margin-bottom:10px;cursor:pointer}
+.note-row b{color:var(--ink)}
+.warn{font-size:13px;background:#fff8e6;border:1px solid #f3dfa6;border-radius:10px;padding:9px 12px;margin-bottom:10px}
+
+/* gaps */
+.gap-row{padding:10px 0;border-top:1px solid var(--line)}
+.gap-row:first-child{border-top:0;padding-top:0}
+.gap-row .t{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;margin-bottom:6px}
+.gap-row .t span{color:var(--ink2);font-size:12.5px}
+.track{height:10px;background:var(--soft);border-radius:4px;display:flex;overflow:hidden;gap:2px}
+.track i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:12px}
+.legend span{display:flex;align-items:center;gap:6px}
+
+/* projection */
+.scen{margin-bottom:10px}
+.svgbox{position:relative;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.5;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:5;transform:translate(-50%,-100%)}
+.tip .r{display:flex;justify-content:space-between;gap:12px}
+.ln{width:16px;height:2px;display:inline-block}
+.proj-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.proj-stats div{border-top:1px solid var(--line);padding-top:8px;font-size:12px;color:var(--ink2)}
+.proj-stats b{display:block;font-size:16px;color:var(--ink)}
+
+/* service */
+.q{font-size:15px;font-weight:700;margin:0 0 4px}
+.qsub{font-size:13.5px;color:var(--ink2);margin:0 0 12px}
+.seg.crim label:has(input:checked){background:var(--crimson)}
+.state{font-size:13px;color:var(--ink2);margin-top:10px;display:flex;gap:8px;align-items:flex-start}
+.ins{border-top:1px solid var(--line)}
+.ins:first-of-type{border-top:0}
+.ins-h{display:grid;grid-template-columns:1fr repeat(4,30px) 16px;gap:4px;align-items:center;padding:11px 0;cursor:pointer}
+.ins-h .co{font-weight:700;font-size:14.5px}
+.ins-h .co small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.mk{width:30px;text-align:center;font-size:13px}
+.mk.y{color:var(--ink)}.mk.n{color:var(--line2)}
+.ins-head{display:grid;grid-template-columns:1fr repeat(4,30px) 16px;gap:4px;font-size:10.5px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--line);line-height:1.25}
+.ins-head span{text-align:center}
+.ins.fit .ins-h .co{color:var(--crimson)}
+.ins-b{display:none;font-size:13px;color:var(--ink2);padding:0 0 12px}
+.ins.open .ins-b{display:block}
+.ins.open .chev{transform:rotate(180deg)}
+.fitbar{font-size:12px;color:var(--ink2);margin:12px 0 2px}
+.foot{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.6}
+.phone{background:#eef1f4;border-radius:16px;border:1px solid var(--line2);overflow:hidden;margin-top:10px}
+.phone-h{background:var(--white);padding:9px 13px;border-bottom:1px solid var(--line);font-size:12.5px}
+.phone-h b{font-size:13px}
+.chat{padding:11px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:86%;padding:8px 11px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg.u{align-self:flex-end;background:#d9f2c9;border-bottom-right-radius:4px;color:var(--ink)}
+.msg.b{align-self:flex-start;background:var(--white);border-bottom-left-radius:4px;border:1px solid var(--line);color:var(--ink)}
+.crit{padding:12px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink2)}
+.crit b{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
+
+pre.summary{white-space:pre-wrap;font-family:var(--font);font-size:13.5px;margin:0;line-height:1.75}
+footer{font-size:11.5px;color:var(--muted);line-height:1.7;margin:22px 2px 0}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(252,252,251,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 16px calc(9px + env(safe-area-inset-bottom))}
+.actions .in{max-width:720px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.actions .sum{flex:1;font-size:12.5px;color:var(--ink2);line-height:1.35}
+.actions .sum b{display:block;font-size:16px;color:var(--ink)}
+.btn{border:1px solid var(--line2);background:var(--white);border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
+.btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="eyebrow">BROKER ADVISORY</div><h1>保險配置建議工作台</h1></div>
+    <select id="preset" aria-label="範例客戶">
+      <option value="">範例客戶</option>
+      <option value="family">雙薪小家庭</option>
+      <option value="single">單身上班族</option>
+      <option value="dink">新婚外勤族</option>
+      <option value="hnw">退休前高資產</option>
+    </select>
+  </div>
+
+  <!-- 1. Input -->
+  <div class="label">描述客戶需求（打字或語音）</div>
+  <div class="card input-card">
+    <textarea id="story" placeholder="例：陳先生 35 歲，已婚，兩個小孩最小 3 歲，年收入 150 萬，每月開銷 6 萬，房貸 800 萬…"></textarea>
+    <div class="input-tools">
+      <button class="mic" id="mic" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micLabel">語音輸入</span></button>
+      <button class="ghost" id="clearStory" type="button">清除</button>
+    </div>
+  </div>
+  <div class="hint" id="micHint">說完自動辨識，下方配置即時更新。</div>
+  <div class="parsed" id="parsed"></div>
+
+  <!-- 2. Quick controls -->
+  <div class="label">即時調整</div>
+  <div class="card" id="quick">
+    <div class="qrow">
+      <div class="qhead"><span>年繳保費預算</span><span class="val num" id="budgetVal"></span></div>
+      <input type="range" id="budgetR" min="0" max="60" step="0.5">
+      <div class="range-foot"><span id="budgetNote"></span><button class="linkbtn" id="budgetAuto" type="button">用建議值</button></div>
+    </div>
+    <div class="qrow">
+      <div class="qhead"><span>風險屬性</span></div>
+      <div class="seg"><label><input type="radio" name="risk" value="c"><span>保守</span></label><label><input type="radio" name="risk" value="m"><span>穩健</span></label><label><input type="radio" name="risk" value="a"><span>積極</span></label></div>
+    </div>
+    <div class="qrow">
+      <div class="qhead"><span>規劃目標</span></div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="goal" value="family">家庭保障</label>
+        <label class="chip"><input type="checkbox" name="goal" value="medical">醫療</label>
+        <label class="chip"><input type="checkbox" name="goal" value="retire">退休</label>
+        <label class="chip"><input type="checkbox" name="goal" value="edu">子女教育</label>
+        <label class="chip"><input type="checkbox" name="goal" value="legacy">傳承</label>
+        <label class="chip"><input type="checkbox" name="goal" value="save">儲蓄</label>
+      </div>
+    </div>
+  </div>
+
+  <details class="more">
+    <summary>細項資料（已依描述帶入）</summary>
+    <div class="more-body">
+      <form id="f" onsubmit="return false">
+        <div class="grp">基本資料</div>
+        <div class="grid2">
+          <div class="field" style="grid-column:1/-1"><label for="name">客戶稱呼</label><input type="text" id="name"></div>
+          <div class="field"><label for="age">年齡</label><div class="unit"><input type="number" inputmode="numeric" id="age"><span>歲</span></div></div>
+          <div class="field"><label>性別</label><div class="seg"><label><input type="radio" name="sex" value="M"><span>男</span></label><label><input type="radio" name="sex" value="F"><span>女</span></label></div></div>
+          <div class="field"><label for="marital">婚姻</label><select id="marital"><option value="single">單身</option><option value="married">已婚</option><option value="divorced">離婚／喪偶</option></select></div>
+          <div class="field"><label for="job">職業類別</label><select id="job"><option value="1">內勤</option><option value="2">外勤</option><option value="3">高風險</option></select></div>
+          <div class="field"><label for="kids">子女人數</label><div class="unit"><input type="number" inputmode="numeric" id="kids"><span>位</span></div></div>
+          <div class="field"><label for="youngest">最小子女</label><div class="unit"><input type="number" inputmode="numeric" id="youngest"><span>歲</span></div></div>
+        </div>
+        <div class="grp">財務</div>
+        <div class="grid2">
+          <div class="field"><label for="income">個人年收入</label><div class="unit"><input type="number" inputmode="decimal" id="income"><span>萬</span></div></div>
+          <div class="field"><label for="exp">家庭月支出</label><div class="unit"><input type="number" inputmode="decimal" id="exp" step="0.5"><span>萬</span></div></div>
+          <div class="field"><label for="debt">負債</label><div class="unit"><input type="number" inputmode="decimal" id="debt"><span>萬</span></div></div>
+          <div class="field"><label for="assets">可動用資產</label><div class="unit"><input type="number" inputmode="decimal" id="assets"><span>萬</span></div></div>
+          <div class="field"><label for="lifeHave">既有壽險保額</label><div class="unit"><input type="number" inputmode="decimal" id="lifeHave"><span>萬</span></div></div>
+          <div class="field"><label for="retire">退休年齡</label><div class="unit"><input type="number" inputmode="numeric" id="retire"><span>歲</span></div></div>
+        </div>
+        <div class="grp">既有保障</div>
+        <label class="check"><input type="checkbox" id="hasMed">已有實支實付醫療險</label>
+        <label class="check"><input type="checkbox" id="hasCI">已有重大傷病／癌症一次金</label>
+        <label class="check"><input type="checkbox" id="hasLTC">已有長照／失能險</label>
+        <div class="grp">試算假設</div>
+        <div class="grid2">
+          <div class="field"><label for="rateA">利變年金宣告利率</label><div class="unit"><input type="number" inputmode="decimal" id="rateA" step="0.05" value="2.25"><span>%</span></div></div>
+          <div class="field"><label for="rateD">分紅中情境報酬</label><div class="unit"><input type="number" inputmode="decimal" id="rateD" step="0.1" value="3.0"><span>%</span></div></div>
+        </div>
+      </form>
+    </div>
+  </details>
+
+  <!-- 3. Hero -->
+  <div class="hero">
+    <div class="who num" id="who"></div>
+    <div class="big num"><b id="bigTotal"></b><span id="bigSub"></span></div>
+    <div class="stack" id="stack"></div>
+    <div class="stack-cap num" id="stackCap"></div>
+    <div class="mini num" id="mini"></div>
+  </div>
+
+  <!-- 4. Tabs -->
+  <nav class="tabs" id="tabs">
+    <button data-t="plan" class="on">配置</button>
+    <button data-t="gap">缺口</button>
+    <button data-t="proj">試算</button>
+    <button data-t="svc">服務<i class="bdg" id="svcBadge"></i></button>
+    <button data-t="sum">摘要</button>
+  </nav>
+
+  <section class="panel on" id="p-plan">
+    <div id="planNote"></div>
+    <div id="prods"></div>
+    <div class="hint">點商品看規劃理由；右側開關可移除項目，預算會自動轉入儲蓄。</div>
+  </section>
+
+  <section class="panel" id="p-gap">
+    <div class="card"><div id="gaps"></div>
+      <div class="legend"><span><i class="sw" style="background:#9c9a93"></i>既有</span><span><i class="sw" style="background:#2a78d6"></i>本次補足</span><span><i class="sw" style="background:var(--soft);border:1px solid var(--line2)"></i>尚餘缺口</span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-proj">
+    <div class="card" id="projCard">
+      <div class="seg scen" id="scen"><label><input type="radio" name="scen" value="low"><span>保守</span></label><label><input type="radio" name="scen" value="mid" checked><span>中性</span></label><label><input type="radio" name="scen" value="high"><span>樂觀</span></label></div>
+      <div class="legend" id="projLegend" style="margin:0 0 6px"></div>
+      <div class="svgbox" id="projBox"></div>
+      <div class="proj-stats num" id="projStats"></div>
+    </div>
+    <div class="card" id="projEmpty" style="display:none;font-size:14px;color:var(--ink2)">本次配置未含儲蓄部位。勾選退休、子女教育、傳承或儲蓄目標，或拉高年繳預算即可試算。</div>
+  </section>
+
+  <section class="panel" id="p-svc">
+    <div class="card">
+      <p class="q">客戶需要隨時查保障範圍嗎？</p>
+      <p class="qsub">建議話術：「保單生效後，如果臨時想知道『這次住院有沒有賠』，您希望能直接用 LINE 問、馬上得到回覆嗎？」</p>
+      <div class="seg crim" id="smartSeg">
+        <label><input type="radio" name="smart" value="yes"><span>需要</span></label>
+        <label><input type="radio" name="smart" value="no"><span>暫不需要</span></label>
+        <label><input type="radio" name="smart" value="unknown" checked><span>尚未詢問</span></label>
+      </div>
+      <div id="smartDyn"></div>
+    </div>
+    <div class="label">其他在意的服務</div>
+    <div class="card">
+      <div class="chips" id="svcChips">
+        <label class="chip"><input type="checkbox" name="svc" value="claims">理賠申請方便</label>
+        <label class="chip"><input type="checkbox" name="svc" value="portal">線上查保單／借款</label>
+        <label class="chip"><input type="checkbox" name="svc" value="concierge">專人一站式服務</label>
+      </div>
+      <div id="svcDyn"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-sum">
+    <div class="card"><pre class="summary" id="summary"></pre></div>
+  </section>
+
+  <footer>
+    本工具為需求分析示意，保費為依年齡與保額之粗估值，實際以各保險公司商品條款、核保結果及正式建議書為準。宣告利率與分紅皆非保證；投資型保單投資風險由要保人承擔。正式招攬前須完成適合度評估（KYC）並遵循招攬與錄音錄影規範。各公司服務功能依公開資訊整理，以其官方最新服務為準。
+  </footer>
+</div>
+
+<div class="actions"><div class="in"><div class="sum num" id="barSum"></div><button class="btn dark" id="copyBtn" type="button">複製摘要</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const HEX = {life:'#2a78d6',med:'#eb6834',ci:'#1baf7a',acc:'#eda100',ltc:'#e87ba4',ann:'#008300',div:'#6250d6',inv:'#e34948',reserve:'#c9c7c0'};
+const NAMES = {life:'定期壽險',med:'醫療實支實付',ci:'重大傷病／癌症',acc:'意外傷害',ltc:'長照失能',ann:'利變年金',div:'分紅保單',inv:'投資型保單',reserve:'保留彈性預算'};
+const fmt = (n,d=0) => Number(n).toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d});
+const wan = n => n >= 100 ? fmt(Math.round(n)) : Number(n).toLocaleString('zh-TW',{maximumFractionDigits:n<10?1:0});
+const r10 = n => Math.round(n/10)*10;
+const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
+const num = (id,def=0) => { const v = parseFloat($(id).value); return isNaN(v) ? def : v; };
+const radio = n => (document.querySelector(`input[name="${n}"]:checked`)||{}).value;
+const CHEV = '<svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>';
+const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+
+/* ===== state ===== */
+const S = { budget:null, off:new Set(), open:new Set(), tab:'plan', openIns:new Set() };
+
+/* ===== parser ===== */
+const DEFAULTS = {name:'客戶',age:35,sex:'M',marital:'single',job:1,kids:0,youngest:0,income:80,exp:4,debt:0,assets:0,budget:null,lifeHave:0,hasMed:false,hasCI:false,hasLTC:false,goals:['family','medical'],risk:'m',retire:65,svc:[],smart:'unknown'};
+const CN = {'零':0,'〇':0,'一':1,'二':2,'兩':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
+function cnToNum(s){ if (/^[0-9.]+$/.test(s)) return parseFloat(s); let t=0,c=0; for (const ch of s){ if (ch in CN) c=CN[ch]; else if (ch==='十'){t+=(c||1)*10;c=0;} else if (ch==='百'){t+=(c||1)*100;c=0;} else if (ch==='千'){t+=(c||1)*1000;c=0;} } return t+c; }
+const N = '([0-9]+(?:\\.[0-9]+)?|[零〇一二兩两三四五六七八九十百千]+)';
+const FILL = '(?:大概|大約|約|約為|差不多|是|有|為|在|還有|剩|剩下|左右)*';
+function toWan(v,u){ if (u==='億') return v*10000; if (u==='千'||u==='千元') return v/10; if (u==='元'||u==='塊') return v/10000; if (!u && v>=10000) return v/10000; return v; }
+function grab(t, heads, sum){ const re = new RegExp(`(?:${heads})${FILL}${N}(萬|億|千元|千|元|塊)?`,'g'); let m, vs=[]; while((m=re.exec(t))) vs.push(toWan(cnToNum(m[1]),m[2])); return vs.length ? (sum ? vs.reduce((a,b)=>a+b,0) : vs[0]) : null; }
+function parseStory(raw){
+  const t = raw.replace(/[０-９]/g,d=>String.fromCharCode(d.charCodeAt(0)-65248)).replace(/\s+/g,'');
+  const o = JSON.parse(JSON.stringify(DEFAULTS)), hit = new Set(), set=(k,v)=>{o[k]=v;hit.add(k);};
+  const nm = t.match(/([一-龥]{1,2})(先生|小姐|太太|女士|董|總)/); if (nm && !/^(她|他|我|的|跟|和|與)/.test(nm[1])) set('name',nm[1]+nm[2]);
+  if (/女性|女生|小姐|女士|太太|媽媽|她/.test(t)) set('sex','F'); else if (/男性|男生|先生|爸爸|他|董/.test(t)) set('sex','M');
+  let childAges=[];
+  for (const cl of t.split(/[，,。；;、\n]|然後|另外/).filter(Boolean)){
+    const isChild=/小孩|孩子|子女|兒子|女兒|小朋友|寶寶|老大|老二/.test(cl), isRet=/退休/.test(cl);
+    const ages=[...cl.matchAll(new RegExp(N+'(?:歲|足歲)','g'))].map(m=>cnToNum(m[1]));
+    if (isRet){ if (ages.length) set('retire',clamp(ages[0],40,80)); else { const r=cl.match(/退休.*?([0-9]{2})/); if (r) set('retire',clamp(+r[1],40,80)); } continue; }
+    if (isChild && ages.length){ childAges.push(...ages); continue; }
+    if (!hit.has('age') && ages.length){ const a=ages.find(x=>x>=18&&x<=80); if (a) set('age',a); }
+    if (!hit.has('age')){ const roc=cl.match(/([5-9][0-9])年次/); if (roc) set('age',clamp(115-(+roc[1]),18,80)); }
+  }
+  const kc = t.match(new RegExp(N+'(?:個|位|名)(?:小孩|孩子|子女|兒子|女兒|小朋友|寶寶)'));
+  if (/一兒一女|一男一女/.test(t)) set('kids',2); else if (kc) set('kids',clamp(cnToNum(kc[1]),0,6)); else if (childAges.length) set('kids',childAges.length); else if (/(兒子|女兒|寶寶|獨生)/.test(t)) set('kids',1);
+  if (/沒有(小孩|孩子|子女)|無子女|頂客|不生/.test(t)) set('kids',0);
+  const yg = t.match(new RegExp('最小(?:的)?(?:小孩|孩子|兒子|女兒)?(?:才|是)?'+N+'歲'));
+  if (yg) set('youngest',cnToNum(yg[1])); else if (childAges.length) set('youngest',Math.min(...childAges));
+  if (/(小孩|孩子|子女)(都)?(已經)?(成年|大了|出社會|工作了)/.test(t)){ set('youngest',25); if (!hit.has('kids')) set('kids',2); }
+  if (/離婚|喪偶|單親/.test(t)) set('marital','divorced'); else if (/已婚|結婚|新婚|老婆|老公|配偶|另一半|夫妻|雙薪/.test(t)) set('marital','married'); else if (/單身|未婚/.test(t)) set('marital','single'); else if (o.kids>0) set('marital','married');
+  if (/高空|工地|營造|消防|警察|軍人|漁|礦|職業駕駛|貨車/.test(t)) set('job',3); else if (/外勤|業務|外送|送貨|跑客戶|司機|外務/.test(t)) set('job',2); else if (/內勤|上班族|工程師|公務員|老師|會計|行政|醫師|設計/.test(t)) set('job',1);
+  let v;
+  if ((v=grab(t,'年收入|年收|年薪|年所得|一年賺|一年收入'))!=null) set('income',v); else if ((v=grab(t,'月薪|月收入|月收|每月收入|一個月賺|每個月賺'))!=null) set('income',Math.round(v*13*10)/10);
+  if ((v=grab(t,'(?:每月|一個月|每個月)(?:的)?(?:支出|開銷|花費|開支|生活費)|月(?:支出|開銷|花費|開支)|生活費(?:每月|一個月)?'))!=null) set('exp',v);
+  if ((v=grab(t,'房貸|負債|貸款|車貸|信貸',true))!=null) set('debt',v);
+  if ((v=grab(t,'存款|資產|存了|現金|積蓄|身價|可動用資金|閒錢'))!=null) set('assets',v);
+  if ((v=grab(t,'預算|年繳|每年(?:可以|能|想)?(?:繳|存|放|投入)'))!=null) set('budget',Math.round(v*10)/10); else if ((v=grab(t,'(?:每月|一個月|每個月|月)(?:可以|能|想)?(?:繳|存|放|投入)|月繳'))!=null) set('budget',Math.round(v*12*10)/10);
+  if ((v=grab(t,'(?:團保|壽險)(?:保額)?'))!=null) set('lifeHave',v);
+  const own='(?:已經有|已有|有買|買過|有保|公司有)';
+  if (new RegExp(own+'.{0,6}(?:實支|醫療)').test(t)) set('hasMed',true);
+  if (new RegExp(own+'.{0,6}(?:癌症|重大傷病|重疾)').test(t)) set('hasCI',true);
+  if (new RegExp(own+'.{0,6}(?:長照|失能)').test(t)) set('hasLTC',true);
+  if (/沒有(任何)?保險|沒保險|都沒(有)?買|完全沒有保障/.test(t)){ set('hasMed',false); set('hasCI',false); set('hasLTC',false); set('lifeHave',0); }
+  const g=[];
+  if (/家庭|家人|保障老婆|保障老公|保障小孩|萬一|責任/.test(t)) g.push('family');
+  if (/醫療|住院|開刀|手術|生病|癌症|重大傷病|長照|健康/.test(t)) g.push('medical');
+  if (/退休|老後|養老|年金/.test(t)) g.push('retire');
+  if (/教育|學費|留學|讀書基金/.test(t)) g.push('edu');
+  if (/傳承|留給|遺產|稅|下一代|財富移轉/.test(t)) g.push('legacy');
+  if (/儲蓄|存錢|強迫儲蓄|存一筆|理財/.test(t)) g.push('save');
+  if (g.length){ if (o.kids>0||o.marital==='married') g.push('family'); set('goals',[...new Set(g)]); }
+  if (/保守|保本|不想虧|不能虧|不要風險|怕風險|穩穩的/.test(t)) set('risk','c'); else if (/積極|衝一點|報酬高|高報酬|可以承受|能承受波動|投資型/.test(t)) set('risk','a'); else if (/穩健|中等|平衡/.test(t)) set('risk','m');
+  if (/(不需要|不用|不要).{0,4}(line|LINE|賴|線上)/.test(t)) set('smart','no');
+  else if (/line|賴|隨時查|查保障|保障範圍|線上問|手機問|不想翻條款|即時回覆|智能客服/i.test(t)) set('smart','yes');
+  const s=[];
+  if (/理賠.{0,4}(方便|快|簡單|麻煩|很慢|跑)|不想跑/.test(t)) s.push('claims');
+  if (/線上查|保單借款|借款|查保單價值|網路查/.test(t)) s.push('portal');
+  if (/專人|一站式|專屬|私人銀行/.test(t)) s.push('concierge');
+  if (s.length) set('svc',s);
+  return {o,hit};
+}
+function writeForm(o){
+  ['name','age','job','kids','youngest','income','exp','debt','assets','lifeHave','retire','marital'].forEach(f=>$(f).value=o[f]);
+  ['hasMed','hasCI','hasLTC'].forEach(f=>$(f).checked=o[f]);
+  document.querySelector(`input[name="sex"][value="${o.sex}"]`).checked=true;
+  document.querySelector(`input[name="risk"][value="${o.risk}"]`).checked=true;
+  document.querySelector(`input[name="smart"][value="${o.smart}"]`).checked=true;
+  document.querySelectorAll('input[name="goal"]').forEach(x=>x.checked=o.goals.includes(x.value));
+  document.querySelectorAll('input[name="svc"]').forEach(x=>x.checked=o.svc.includes(x.value));
+  S.budget = o.budget; S.off.clear(); S.open.clear();
+}
+function renderParsed(o,hit){
+  const c=[], ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'};
+  if (hit.has('name')) c.push(o.name); if (hit.has('age')) c.push(`${o.age} 歲`); if (hit.has('marital')) c.push(ms[o.marital]);
+  if (hit.has('kids')) c.push(o.kids?`子女 ${o.kids} 位${hit.has('youngest')?`・最小 ${o.youngest} 歲`:''}`:'無子女');
+  if (hit.has('job')) c.push(['','內勤','外勤','高風險職業'][o.job]);
+  if (hit.has('income')) c.push(`年收入 ${wan(o.income)} 萬`); if (hit.has('exp')) c.push(`月支出 ${wan(o.exp)} 萬`);
+  if (hit.has('debt')) c.push(`負債 ${wan(o.debt)} 萬`); if (hit.has('assets')) c.push(`資產 ${wan(o.assets)} 萬`);
+  if (hit.has('budget')) c.push(`預算 ${wan(o.budget)} 萬/年`); if (hit.has('lifeHave')) c.push(o.lifeHave?`既有壽險 ${wan(o.lifeHave)} 萬`:'無既有保險');
+  if (o.hasMed) c.push('已有實支'); if (o.hasCI) c.push('已有重疾'); if (o.hasLTC) c.push('已有長照');
+  if (hit.has('retire')) c.push(`${o.retire} 歲退休`); if (hit.has('risk')) c.push({c:'保守',m:'穩健',a:'積極'}[o.risk]+'型');
+  if (hit.has('smart')) c.push(o.smart==='yes'?'想隨時查保障':'暫不需 LINE 查詢');
+  const miss=[]; if (!hit.has('age')) miss.push('年齡'); if (!hit.has('income')) miss.push('年收入'); if (!hit.has('exp')) miss.push('月支出');
+  if (!hit.has('debt')&&!hit.has('assets')) miss.push('負債／資產'); if (!hit.has('lifeHave')&&!o.hasMed) miss.push('既有保障');
+  $('parsed').innerHTML = c.map(x=>`<span class="pchip">${x}</span>`).join('') + (miss.length?`<div class="miss-lab">尚未提到，可補問：</div>`+miss.map(m=>`<span class="pchip miss">${m}</span>`).join(''):'');
+}
+let pt;
+function parseAndApply(){ const txt=$('story').value.trim(); if (!txt){ $('parsed').innerHTML=''; return; } const {o,hit}=parseStory(txt); writeForm(o); renderParsed(o,hit); render(); }
+$('story').addEventListener('input',()=>{ clearTimeout(pt); pt=setTimeout(parseAndApply,350); });
+$('clearStory').addEventListener('click',()=>{ $('story').value=''; $('parsed').innerHTML=''; writeForm(JSON.parse(JSON.stringify(DEFAULTS))); render(); $('story').focus(); });
+
+/* ===== voice ===== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, listening=false, base='';
+function micUI(){ $('mic').classList.toggle('on',listening); $('micLabel').textContent = listening?'聆聽中・點擊停止':'語音輸入'; }
+function fallbackMic(){ $('story').focus(); $('micHint').innerHTML='<b style="color:var(--ink)">此環境無法直接收音</b>：請點手機鍵盤上的麥克風聽寫，文字出現後自動辨識。'; toast('請改用鍵盤上的麥克風聽寫'); }
+$('mic').addEventListener('click',()=>{
+  if (!SR) return fallbackMic();
+  if (listening){ try{rec.stop();}catch(e){} return; }
+  try{
+    rec=new SR(); rec.lang='zh-TW'; rec.interimResults=true; rec.continuous=true;
+    base=$('story').value.trim(); if (base && !/[，。,]$/.test(base)) base+='，';
+    rec.onresult=e=>{ let s=''; for (let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; $('story').value=base+s; clearTimeout(pt); pt=setTimeout(parseAndApply,250); };
+    rec.onend=()=>{ listening=false; micUI(); parseAndApply(); };
+    rec.onerror=e=>{ listening=false; micUI(); if (/not-allowed/.test(e.error)) fallbackMic(); else if (!/no-speech|aborted/.test(e.error)) toast('語音辨識中斷，請再試一次'); };
+    rec.start(); listening=true; micUI();
+  }catch(e){ listening=false; micUI(); fallbackMic(); }
+});
+
+/* ===== planning ===== */
+function read(){
+  return { name:$('name').value.trim()||'客戶', age:clamp(num('age',35),18,75), sex:radio('sex')||'M', marital:$('marital').value, job:+$('job').value,
+    kids:clamp(num('kids'),0,6), youngest:clamp(num('youngest'),0,40), income:Math.max(0,num('income')), exp:Math.max(0,num('exp')),
+    debt:Math.max(0,num('debt')), assets:Math.max(0,num('assets')), lifeHave:Math.max(0,num('lifeHave')), retire:clamp(num('retire',65),40,80),
+    hasMed:$('hasMed').checked, hasCI:$('hasCI').checked, hasLTC:$('hasLTC').checked,
+    goals:[...document.querySelectorAll('input[name="goal"]:checked')].map(x=>x.value),
+    svc:[...document.querySelectorAll('input[name="svc"]:checked')].map(x=>x.value),
+    smart:radio('smart')||'unknown', risk:radio('risk')||'m', rateA:clamp(num('rateA',2.25),0,6), rateD:clamp(num('rateD',3),0,8), budget:S.budget };
+}
+function plan(c){
+  const a=c.age, sexF=c.sex==='F'?0.75:1, yrsToRet=c.retire-a, kidsDep=c.kids>0&&c.youngest<22, has=g=>c.goals.includes(g);
+  const support = kidsDep ? clamp(22-c.youngest,5,20) : (c.marital==='married'?5:2);
+  const edu = kidsDep ? c.kids*250*Math.max(0,22-c.youngest)/22 : 0;
+  const lifeNeed = Math.max(0, r10(c.debt + c.exp*12*support*0.7 + edu + 50 - c.assets*0.3));
+  const lifeGap = Math.max(0, lifeNeed-c.lifeHave), hasDependents = c.marital==='married'||kidsDep;
+  const ciNeed=clamp(r10(c.income*2),100,300), accNeed=clamp(r10(c.income*5),300,1000), jobF=[1,1,1.6,2.5][c.job];
+  const termRate=0.12*Math.exp(0.075*(a-25))*sexF;
+  const prem={life:g=>g/100*termRate, med:()=>0.8*Math.exp(0.042*(a-25)), ci:g=>g/100*0.28*Math.exp(0.058*(a-25)), acc:g=>g/100*0.11*jobF+0.15*jobF, ltc:()=>1.0*Math.exp(0.045*(a-25))};
+  const saveGoals=['retire','edu','legacy','save'].filter(has).length;
+  const pct=Math.min(0.10+saveGoals*0.03+(c.assets>c.income*10?0.05:0),0.25), suggested=Math.round(c.income*pct*2)/2;
+  const budget = c.budget!=null ? c.budget : suggested;
+  const items=[];
+  if (lifeGap>0) items.push({key:'life',pr:hasDependents?1:3,cover:lifeGap,unit:'萬',label:'保額',available:a<=64});
+  if (!c.hasMed) items.push({key:'med',pr:has('medical')?1:2,cover:30,unit:'萬',label:'雜費限額'});
+  if (!c.hasCI) items.push({key:'ci',pr:1,cover:ciNeed,unit:'萬',label:'一次金'});
+  items.push({key:'acc',pr:c.job>=2?1:2,cover:accNeed,unit:'萬',label:'保額'});
+  if (!c.hasLTC) items.push({key:'ltc',pr:a>=45?1:2,cover:3,unit:'萬/月',label:'月給付'});
+  items.forEach(i=>{ i.premium = i.available===false?0:prem[i.key](i.cover); i.status='in'; });
+  const order=['med','ci','life','acc','ltc'];
+  items.sort((x,y)=>x.pr-y.pr||order.indexOf(x.key)-order.indexOf(y.key));
+  let left=budget, shortfall=false;
+  for (const i of items){
+    if (i.available===false){ i.status='na'; continue; }
+    if (S.off.has(i.key)){ i.status='off'; continue; }
+    if (i.premium<=left+1e-9){ left-=i.premium; continue; }
+    if (i.key==='life' && left>0){ const aff=Math.floor(left/termRate*100/50)*50; if (aff>=100){ i.cover=aff; i.premium=prem.life(aff); left-=i.premium; i.status='partial'; shortfall=true; continue; } }
+    i.status='deferred'; shortfall=true;
+  }
+  const spent=items.filter(i=>i.status==='in'||i.status==='partial').reduce((s,i)=>s+i.premium,0);
+  let Sv=Math.max(0,budget-spent), reserve=0;
+  if (saveGoals===0){ reserve=Sv*0.5; Sv-=reserve; }
+  const w={...({c:{ann:.7,div:.3,inv:0},m:{ann:.45,div:.45,inv:.10},a:{ann:.25,div:.40,inv:.35}}[c.risk])};
+  if (has('retire')) w.ann+=.15; if (has('legacy')) w.div+=.25; if (has('edu')){w.ann+=.05;w.div+=.05;} if (has('save')){w.ann+=.05;w.div+=.05;}
+  if (a>=60||c.risk==='c') w.inv=0;
+  ['ann','div','inv'].forEach(k=>{ if (S.off.has(k)) w[k]=0; });
+  const tw=w.ann+w.div+w.inv;
+  let sav = tw>0 ? {ann:Sv*w.ann/tw, div:Sv*w.div/tw, inv:Sv*w.inv/tw} : {ann:0,div:0,inv:0};
+  if (tw===0){ reserve+=Sv; }
+  for (const k of ['inv','div','ann']) if (sav[k]>0 && sav[k]<3 && Sv>=3){ const tg=Object.keys(sav).filter(x=>x!==k&&w[x]>0).sort((p,q)=>sav[q]-sav[p])[0]; if (tg){ sav[tg]+=sav[k]; sav[k]=0; } }
+  if (Sv<3 && tw>0){ reserve+=Sv; sav={ann:0,div:0,inv:0}; }
+  // savings rows (show even when toggled off, so they can be toggled back)
+  const savKeys = ['ann','div','inv'].filter(k=> sav[k]>0 || S.off.has(k));
+  const payY = yrsToRet>0?clamp(yrsToRet,6,20):6, H = yrsToRet>0?Math.max(yrsToRet,payY):15;
+  const sc={low:{ann:c.rateA-.5,div:c.rateD-1,inv:1},mid:{ann:c.rateA,div:c.rateD,inv:4.5},high:{ann:c.rateA+.25,div:c.rateD+1,inv:7}};
+  const val={low:{ann:0,div:0,inv:0},mid:{ann:0,div:0,inv:0},high:{ann:0,div:0,inv:0}}, proj=[{t:0,age:a,low:0,mid:0,high:0,paid:0}]; let paid=0;
+  for (let t=1;t<=H;t++){ const on=t<=payY; if (on) paid+=sav.ann+sav.div+sav.inv; const row={t,age:a+t,paid};
+    for (const s of ['low','mid','high']){ let sum=0; for (const k of ['ann','div','inv']){ val[s][k]=(val[s][k]+(on?sav[k]:0))*(1+Math.max(0,sc[s][k])/100); sum+=val[s][k]; } row[s]=sum; } proj.push(row); }
+  const retNeed = yrsToRet>0 ? c.exp*0.7*12*20*Math.pow(1.02,yrsToRet) : 0;
+  const atRet = yrsToRet>0 ? proj[Math.min(yrsToRet,H)] : proj[proj.length-1];
+  const alloc=[]; items.filter(i=>i.status==='in'||i.status==='partial').forEach(i=>alloc.push({key:i.key,amt:i.premium}));
+  ['ann','div','inv'].forEach(k=>{ if (sav[k]>0) alloc.push({key:k,amt:sav[k]}); }); if (reserve>0.05) alloc.push({key:'reserve',amt:reserve});
+  const total=alloc.filter(x=>x.key!=='reserve').reduce((s,x)=>s+x.amt,0);
+  return {c,lifeNeed,lifeGap,support,edu,ciNeed,accNeed,items,sav,savKeys,reserve,budget,suggested,pct,total,shortfall,proj,payY,H,retNeed,atRet,yrsToRet,alloc,hasDependents,readiness:retNeed>0?atRet.mid/retNeed:null};
+}
+
+/* ===== insurer & service data (public info) ===== */
+const COLS = ['保障內容','保單繳費','借款試算','理賠'];
+const INSURERS = [
+  {name:'保誠人壽', bot:'智能客服「保寶」', ch:'LINE 官方帳號・官網・FB', cap:[1,1,0,1], note:'可詢問保單內容、網路投保、保費查詢及理賠；以多年客服常見問題設計約 500 個情境問題。', src:'保誠人壽新聞稿（2019）；2026 年春節服務公告仍列為 LINE 服務管道'},
+  {name:'南山人壽', bot:'智能客服「透透 Talk Talk」', ch:'官方 LINE・官網・保戶園地・APP', cap:[0,1,1,0], note:'保單狀態、繳費、近期應領，借還款與解約金試算，保單變更與處理進度；NLU 結合 LLM，複雜問題轉真人文字客服。', src:'南山人壽保戶通知；iThome（2025）'},
+  {name:'國泰人壽', bot:'智能客服「阿發」', ch:'LINE 官方帳號・官網・APP', cap:[0,1,1,0], note:'查詢保單現況、繳費紀錄，申請保單貸款，查詢所屬業務員。', src:'ETtoday、iThome（2018）'},
+  {name:'富邦人壽', bot:'「富邦FUBON」LINE 個人化服務', ch:'富邦金控共用 LINE 官方帳號', cap:[0,0,1,1], note:'綁定後可收理賠、保險給付與保單借還款等案件受理進度通知；另有電話智能語音客服查詢保單。', src:'富邦金控（2025）；富邦人壽官網'},
+  {name:'新光人壽', bot:'LINE 官方帳號個人化服務', ch:'LINE 官方帳號・APP', cap:[0,1,1,0], note:'保單／借款查詢、個人權益通知推播；業界較早推出 LINE 個人化保險服務。', src:'數位時代、今周刊（2019–2021）'}
+];
+const SVC = {
+  claims:{t:'理賠申請便利', d:'實支實付與意外險屬高頻理賠險種。可比較是否支援「理賠聯盟鏈」線上申請（多家公司參與，資料可同步轉送）及其他送件管道，例如保誠人壽可透過 7-ELEVEN ibon 24 小時申請。', keys:['med','acc','ci']},
+  portal:{t:'線上查保單與借款', d:'儲蓄型保單持有期長，可比較各公司保戶網站／APP 是否 24 小時查詢保單價值與申請借款，例如保誠「保戶e點通」、南山「保戶園地」。', keys:['ann','div','inv']},
+  concierge:{t:'專人一站式服務', d:'高額保單與傳承規劃牽涉核保與受益人安排，可比較是否提供專屬個案經理，例如「保誠人壽尊享」針對高資產客群提供一站式跟進。', keys:['div','life']}
+};
+const COVER_KEYS = ['med','ci','acc','ltc'];
+
+/* ===== render ===== */
+function render(){
+  const c=read(), p=plan(c);
+  renderQuick(p); renderHero(p); renderPlan(p); renderGaps(p); renderProj(p); renderSvc(p); renderSummary(p);
+  $('svcBadge').style.display = c.smart==='unknown' ? '' : 'none';
+  $('barSum').innerHTML = `<b>年繳約 ${wan(p.total)} 萬</b>月均 ${fmt(p.total*10000/12)} 元・占收入 ${fmt(c.income?p.total/c.income*100:0,1)}%`;
+}
+function renderQuick(p){
+  const r=$('budgetR'), max=Math.max(10, Math.ceil(p.c.income*0.35/5)*5);
+  r.max=max; r.value=Math.min(p.budget,max);
+  $('budgetVal').innerHTML = `${wan(p.budget)}<small>萬／年</small>`;
+  $('budgetNote').textContent = p.c.budget==null ? `建議值：年收入 ${Math.round(p.pct*100)}%` : `建議值 ${wan(p.suggested)} 萬`;
+  $('budgetAuto').style.visibility = p.c.budget==null ? 'hidden' : 'visible';
+}
+function renderHero(p){
+  const c=p.c, ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'}[c.marital];
+  $('who').textContent = `${c.name}・${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${fmt(c.income)} 萬`;
+  $('bigTotal').textContent = wan(p.total); $('bigSub').textContent = `萬元／年・月均 ${fmt(p.total*10000/12)} 元`;
+  const sum = p.alloc.reduce((s,x)=>s+x.amt,0)||1;
+  $('stack').innerHTML = p.alloc.map((x,i)=>`<i data-i="${i}" style="width:${x.amt/sum*100}%;background:${HEX[x.key]}" title="${NAMES[x.key]}"></i>`).join('');
+  const prot = p.alloc.filter(x=>['life','med','ci','acc','ltc'].includes(x.key)).reduce((s,x)=>s+x.amt,0);
+  const cap0 = `保障 <b>${fmt(prot/sum*100)}%</b>・儲蓄 <b>${fmt((sum-prot-p.reserve)/sum*100)}%</b>${p.reserve>0.05?`・保留 <b>${fmt(p.reserve/sum*100)}%</b>`:''}　<span style="color:var(--muted)">點色塊看明細</span>`;
+  $('stackCap').innerHTML = cap0;
+  $('stack').querySelectorAll('i').forEach(el=>el.addEventListener('click',e=>{
+    e.stopPropagation(); const x=p.alloc[+el.dataset.i], on=el.classList.contains('on');
+    $('stack').querySelectorAll('i').forEach(j=>j.classList.remove('on'));
+    if (on){ $('stack').classList.remove('dim'); $('stackCap').innerHTML=cap0; return; }
+    el.classList.add('on'); $('stack').classList.add('dim');
+    $('stackCap').innerHTML = `<i class="sw" style="background:${HEX[x.key]};vertical-align:-1px"></i> <b>${NAMES[x.key]}</b>　年繳 ${wan(x.amt)} 萬・${fmt(x.amt/sum*100,1)}%`;
+  }));
+  const ratio=c.income>0?p.total/c.income:0, rc = ratio<=.15?'var(--good)':ratio<=.25?'var(--warning)':'var(--critical)';
+  const tot=p.items.filter(i=>!['na','off'].includes(i.status)).length, cov=p.items.filter(i=>i.status==='in').length;
+  $('mini').innerHTML = `<div>占年收入<b><span class="dot" style="background:${rc}"></span>${fmt(ratio*100,1)}%</b></div>
+    <div>缺口補足<b>${cov}／${tot} 項</b></div>
+    <div>退休準備率<b>${p.readiness==null?'—':fmt(Math.min(p.readiness,9.99)*100)+'%'}</b></div>`;
+}
+function reason(p,i){
+  const c=p.c;
+  switch(i.key){
+    case 'life': { if (!p.hasDependents) return `目前無扶養責任，保留負債與身後費用即可，列為視預算項目。`;
+      const parts=[]; if (c.debt) parts.push(`負債 ${wan(c.debt)} 萬`); parts.push(`${p.support} 年家庭生活費`); if (p.edu>0) parts.push(`子女教育 ${wan(p.edu)} 萬`);
+      return `家庭責任需求 ${wan(p.lifeNeed)} 萬（${parts.join('、')}），扣除既有 ${wan(c.lifeHave)} 萬後缺口 ${wan(p.lifeGap)} 萬；以定期壽險補足，保費效率最高。` + (i.status==='partial'?`受預算限制先配置 ${wan(i.cover)} 萬。`:''); }
+    case 'med': return '承接健保以外的自費醫材、病房差額與手術費用，建議雜費限額 30 萬元，搭配住院日額 3,000 元。';
+    case 'ci': return `確診重大傷病或癌症時給付一次金，約 ${fmt(i.cover/Math.max(c.income,1),1)} 年收入，支應治療期間收入中斷與自費療程。`;
+    case 'acc': return `${['','內勤職業','外勤職業','高風險職業'][c.job]}，規劃意外身故／失能保障並附加意外實支實付${c.job>=2?'；外勤職類列為必要保障':''}。`;
+    case 'ltc': return `${c.age>=45?'已進入失能風險上升期，':'年輕投保可鎖定較低費率，'}失能時每月給付 3 萬元。`;
+    case 'ann': return `累積${c.goals.includes('retire')?'退休金':'中長期資金'}，${p.payY} 年繳費，假設宣告利率 ${fmt(c.rateA,2)}%（非保證），退休後可轉年金給付。`;
+    case 'div': return `兼具保證給付與分紅潛力，${c.goals.includes('legacy')?'可指定受益人做為資產傳承工具':'適合中長期穩健儲蓄'}；分紅非保證。`;
+    case 'inv': return '依積極屬性少量配置，參與市場成長；須另行揭露投資風險並完成適合度評估。';
+  }
+}
+function svcLine(p,key){
+  const c=p.c;
+  if (c.smart==='yes' && COVER_KEYS.includes(key)) return `<div class="svc-line">${SHIELD}<div><b>服務搭配</b>這類保單條款細，客戶出險時最常問「有沒有賠」。選承保公司時，可優先比較能用 LINE 即時說明保障內容者（見「服務」頁）。</div></div>`;
+  const hit = c.svc.find(s=>SVC[s].keys.includes(key));
+  if (hit) return `<div class="svc-line">${SHIELD}<div><b>服務搭配</b>客戶在意「${SVC[hit].t}」，選承保公司時一併比較（見「服務」頁）。</div></div>`;
+  return '';
+}
+function prodRow(p, key, figs, tag, status){
+  const off = S.off.has(key), open = S.open.has(key), locked = status==='na';
+  return `<div class="prow${off?' off':''}${open?' open':''}" data-k="${key}">
+    <div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX[key]}"></i>${NAMES[key]} ${tag}</div><div class="sub">${figs}</div></div>
+      <div class="amt">${off?'已移除':status==='deferred'?'下階段':'年繳'}<b>${off||status==='deferred'||locked?'—':wan(p._prem[key])+' 萬'}</b></div>
+      ${locked?'':`<label class="tgl" onclick="event.stopPropagation()"><input type="checkbox" data-tgl="${key}" ${off?'':'checked'} aria-label="納入${NAMES[key]}"><span></span></label>`}
+      ${CHEV}</div>
+    <div class="pbody"><p>${p._reason[key]}</p>${off?'':svcLine(p,key)}</div></div>`;
+}
+function renderPlan(p){
+  const prL={1:'P1',2:'P2',3:'P3'}; p._prem={}; p._reason={};
+  let html='';
+  p.items.forEach(i=>{
+    p._prem[i.key]=i.premium; p._reason[i.key]= i.status==='na' ? '65 歲以上定期壽險承保受限，改以分紅／終身型保單處理。' : reason(p,i);
+    const tag = i.status==='na' ? '<span class="tag def">不適用</span>' : i.status==='deferred' ? '<span class="tag def">預算外</span>' : `<span class="tag p${i.pr}">${prL[i.pr]}</span>`;
+    html += prodRow(p, i.key, `${i.label} ${wan(i.cover)} ${i.unit}${i.status==='partial'?'（先部分配置）':''}`, tag, i.status);
+  });
+  p.savKeys.forEach(k=>{ p._prem[k]=p.sav[k]; p._reason[k]=reason(p,{key:k}); html += prodRow(p,k,`儲蓄配置・繳 ${p.payY} 年`,'<span class="tag p2">儲蓄</span>','in'); });
+  if (p.reserve>0.05) html += `<div class="prow off"><div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX.reserve}"></i>保留彈性預算</div><div class="sub">尚未提到儲蓄目標，先保留</div></div><div class="amt">年度<b>${wan(p.reserve)} 萬</b></div></div></div>`;
+  $('prods').innerHTML = html;
+  let note='';
+  if (p.shortfall) note += `<div class="warn">預算 ${wan(p.budget)} 萬不足以一次補足全部缺口，已依優先順序配置；可拉高上方預算，或於加薪、房貸遞減時補上「預算外」項目。</div>`;
+  if (p.c.smart==='unknown') note += `<div class="note-row" data-go="svc"><span>還沒確認客戶是否需要<b>隨時查保障範圍</b></span><span>去詢問 →</span></div>`;
+  $('planNote').innerHTML = note;
+  $('prods').querySelectorAll('.prow[data-k] .ph').forEach(h=>h.addEventListener('click',()=>{ const k=h.parentElement.dataset.k; S.open.has(k)?S.open.delete(k):S.open.add(k); h.parentElement.classList.toggle('open'); }));
+  $('prods').querySelectorAll('[data-tgl]').forEach(t=>t.addEventListener('change',()=>{ const k=t.dataset.tgl; t.checked?S.off.delete(k):S.off.add(k); render(); toast(t.checked?`已納入${NAMES[k]}`:`已移除${NAMES[k]}，預算轉入其他項目`); }));
+  $('planNote').querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.go)));
+}
+function renderGaps(p){
+  const c=p.c, rec=k=>p.items.find(i=>i.key===k), ok=i=>i&&(i.status==='in'||i.status==='partial'), L=rec('life');
+  const rows=[
+    {l:'壽險',s:`${p.support} 年家庭責任`,need:p.lifeNeed,have:Math.min(c.lifeHave,p.lifeNeed),add:ok(L)?L.cover:0,u:'萬'},
+    {l:'醫療實支',s:'雜費限額',need:30,have:c.hasMed?30:0,add:ok(rec('med'))?30:0,u:'萬'},
+    {l:'重大傷病',s:'約 2 年收入',need:p.ciNeed,have:c.hasCI?p.ciNeed:0,add:ok(rec('ci'))?p.ciNeed:0,u:'萬'},
+    {l:'意外傷害',s:'約 5 年收入',need:p.accNeed,have:0,add:ok(rec('acc'))?p.accNeed:0,u:'萬'},
+    {l:'長照失能',s:'每月給付',need:3,have:c.hasLTC?3:0,add:ok(rec('ltc'))?3:0,u:'萬/月'}];
+  $('gaps').innerHTML = rows.map(r=>{ const hp=r.need?Math.min(100,r.have/r.need*100):100, ap=r.need?Math.min(100-hp,r.add/r.need*100):0, rem=Math.max(0,r.need-r.have-r.add);
+    return `<div class="gap-row"><div class="t"><div><b>${r.l}</b> <span>${r.s}・需求 ${wan(r.need)} ${r.u}</span></div><span class="num">${r.need===0?'無需求':rem<=.001?'已補足':`尚缺 ${wan(rem)}`}</span></div>
+      <div class="track">${hp>0?`<i style="width:${hp}%;background:#9c9a93"></i>`:''}${ap>0?`<i style="width:${ap}%;background:#2a78d6"></i>`:''}</div></div>`; }).join('');
+}
+function niceMax(v){ if (v<=0) return 10; const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e; }
+function renderProj(p){
+  const st=p.sav.ann+p.sav.div+p.sav.inv;
+  $('projCard').style.display = st>0?'':'none'; $('projEmpty').style.display = st>0?'none':'';
+  if (st<=0) return;
+  const sk=radio('scen')||'mid', scName={low:'保守',mid:'中性',high:'樂觀'}[sk];
+  const W=360,H=220,m={l:44,r:10,t:16,b:28}, d=p.proj, maxV=Math.max(...d.map(x=>x.high));
+  const showNeed=p.retNeed>0&&p.retNeed<=maxV*1.6, ymax=niceMax(Math.max(maxV,showNeed?p.retNeed:0)*1.05);
+  const X=t=>m.l+t/p.H*(W-m.l-m.r), Y=v=>H-m.b-v/ymax*(H-m.t-m.b);
+  $('projLegend').innerHTML = `<span><i class="ln" style="background:#141414"></i>${scName}情境保單價值</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,#9c9a93 0 4px,transparent 4px 7px)"></i>累積已繳</span>${showNeed?`<span><i class="ln" style="background:repeating-linear-gradient(90deg,#9b1c25 0 2px,transparent 2px 5px)"></i>退休需求</span>`:''}`;
+  let g='';
+  for (let i=0;i<=4;i++){ const v=ymax*i/4,y=Y(v); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#e3e1db"/><text x="${m.l-6}" y="${y+3.5}" text-anchor="end" font-size="10" fill="#8a8984">${fmt(v)}</text>`; }
+  const step=p.H>20?5:p.H>10?3:p.H>6?2:1;
+  for (let t=0;t<=p.H;t+=step) g+=`<text x="${X(t)}" y="${H-m.b+16}" text-anchor="middle" font-size="10" fill="#8a8984">${p.c.age+t}歲</text>`;
+  g+=`<text x="${m.l-6}" y="${m.t-5}" text-anchor="end" font-size="9.5" fill="#8a8984">萬元</text>`;
+  // band low-high
+  const band = d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r.high).toFixed(1)}`).join('') + d.slice().reverse().map(r=>`L${X(r.t).toFixed(1)},${Y(r.low).toFixed(1)}`).join('') + 'Z';
+  g+=`<path d="${band}" fill="#2a78d6" opacity=".10"/>`;
+  if (showNeed){ const y=Y(p.retNeed); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#9b1c25" stroke-width="1.5" stroke-dasharray="2 3"/><text x="${m.l+4}" y="${y-5}" font-size="10" fill="#9b1c25">退休需求 ${wan(p.retNeed)} 萬</text>`; }
+  g+=`<path d="${d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r.paid).toFixed(1)}`).join('')}" fill="none" stroke="#9c9a93" stroke-width="2" stroke-dasharray="4 3"/>`;
+  g+=`<path d="${d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r[sk]).toFixed(1)}`).join('')}" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const last=d[d.length-1]; g+=`<text x="${X(p.H)-2}" y="${Y(last[sk])-8}" text-anchor="end" font-size="11" font-weight="600" fill="#141414">${wan(last[sk])} 萬</text>`;
+  g+=`<line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="#141414" opacity="0"/><circle id="xd" r="4" fill="#141414" stroke="#fcfcfb" stroke-width="2" opacity="0"/><rect id="hit" x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent"/>`;
+  $('projBox').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="儲蓄累積試算">${g}</svg><div class="tip" id="ptip"></div>`;
+  const svg=$('projBox').querySelector('svg'), tip=$('ptip');
+  const mv=e=>{ const rb=svg.getBoundingClientRect(), t=clamp(Math.round(((e.clientX-rb.left)/rb.width*W-m.l)/(W-m.l-m.r)*p.H),0,p.H), r=d[t];
+    $('xh').setAttribute('x1',X(t)); $('xh').setAttribute('x2',X(t)); $('xh').setAttribute('opacity',.3);
+    $('xd').setAttribute('cx',X(t)); $('xd').setAttribute('cy',Y(r[sk])); $('xd').setAttribute('opacity',1);
+    tip.innerHTML=`<b>${r.age} 歲</b><div class="r"><span>${scName}</span><span>${wan(r[sk])} 萬</span></div><div class="r"><span>區間</span><span>${wan(r.low)}～${wan(r.high)}</span></div><div class="r"><span>已繳</span><span>${wan(r.paid)} 萬</span></div>`;
+    tip.style.left=clamp(X(t)/W*rb.width,64,rb.width-64)+'px'; tip.style.top=(Y(r.high)/H*rb.height-8)+'px'; tip.style.opacity=1; };
+  $('hit').addEventListener('pointermove',mv); $('hit').addEventListener('pointerdown',mv);
+  $('hit').addEventListener('pointerleave',()=>{ tip.style.opacity=0; $('xh').setAttribute('opacity',0); $('xd').setAttribute('opacity',0); });
+  const ar=p.atRet;
+  $('projStats').innerHTML = `<div>${p.yrsToRet>0?p.c.retire:ar.age} 歲・${scName}<b>${wan(ar[sk])} 萬</b></div><div>累積已繳<b>${wan(ar.paid)} 萬</b></div><div>${p.retNeed>0?'退休需求':'保守～樂觀'}<b>${p.retNeed>0?wan(p.retNeed)+' 萬':wan(ar.low)+'～'+wan(ar.high)}</b></div>`;
+}
+function chatFor(p){
+  const c=p.c, rec=k=>p.items.find(i=>i.key===k&&(i.status==='in'||i.status==='partial')), m=[];
+  m.push(['u','我住院開刀，保單可以賠哪些？']);
+  m.push(['b', rec('med')?'依您的醫療實支實付：住院自費醫材、病房差額等雜費，限額 30 萬元內實支實付；另有住院日額每日 3,000 元。':c.hasMed?'依您持有的實支實付醫療險，住院雜費與手術費用於條款限額內實支實付。':'目前規劃未含醫療實支實付，住院費用以健保給付為主，建議與您的保險顧問討論。']);
+  const ci=rec('ci'); if (ci){ m.push(['u','如果確診癌症呢？']); m.push(['b',`確診且符合重大傷病條款定義，可一次給付 ${wan(ci.cover)} 萬元。實際以保單條款及理賠審核為準。`]); }
+  return m;
+}
+function renderSvc(p){
+  const c=p.c, dyn=$('smartDyn');
+  const inPlan=new Set([...p.items.filter(i=>i.status==='in'||i.status==='partial').map(i=>i.key),...['ann','div','inv'].filter(k=>p.sav[k]>0)]);
+  const coverProds = COVER_KEYS.filter(k=>inPlan.has(k)).map(k=>NAMES[k]);
+  if (c.smart==='unknown'){ dyn.innerHTML = `<div class="state">選「需要」後，會列出可在 LINE 查詢保障的壽險公司比較。</div>`; }
+  else if (c.smart==='no'){ dyn.innerHTML = `<div class="state"><span class="dot" style="background:var(--muted);margin-top:6px"></span><span>已記錄：客戶暫不需要。建議於保單生效、寄送保單時再問一次；隨時可改選「需要」。</span></div>`; }
+  else {
+    const ranked = INSURERS.map(x=>({...x, fit: x.cap[0]*2 + x.cap[3] + x.cap[1]*0.5})).sort((a,b)=>b.fit-a.fit);
+    dyn.innerHTML = `<div class="fitbar">依「保障內容可即時說明」排序${coverProds.length?`，對應本次 ${coverProds.join('、')}`:''}：</div>
+      <div class="ins-head"><span style="text-align:left">壽險公司・LINE 服務</span>${COLS.map(x=>`<span>${x}</span>`).join('')}<span></span></div>
+      ${ranked.map((x,i)=>`<div class="ins${i===0&&x.cap[0]?' fit':''}${S.openIns.has(x.name)?' open':''}" data-n="${x.name}">
+        <div class="ins-h"><div class="co">${x.name}<small>${x.bot}</small></div>${x.cap.map(v=>`<span class="mk ${v?'y':'n'}">${v?'●':'○'}</span>`).join('')}${CHEV}</div>
+        <div class="ins-b"><div><b style="color:var(--ink)">管道</b>　${x.ch}</div><div style="margin-top:4px">${x.note}</div><div style="margin-top:4px;color:var(--muted);font-size:12px">來源：${x.src}</div>
+        ${x.cap[0]?`<div class="phone"><div class="phone-h"><b>${x.name}</b>　${x.bot}・依本次配置示意</div><div class="chat">${chatFor(p).map(([w,t])=>`<div class="msg ${w}">${t}</div>`).join('')}</div></div>`:''}</div></div>`).join('')}
+      <div class="foot">● 公開資料明確列出該功能　○ 公開資料未明確列出（不代表沒有）。各公司服務持續更新，建議向客戶說明前以官方資訊確認。</div>`;
+    dyn.querySelectorAll('.ins-h').forEach(h=>h.addEventListener('click',()=>{ const n=h.parentElement.dataset.n; S.openIns.has(n)?S.openIns.delete(n):S.openIns.add(n); h.parentElement.classList.toggle('open'); }));
+  }
+  $('svcDyn').innerHTML = c.svc.map(k=>{ const s=SVC[k], ap=s.keys.filter(x=>inPlan.has(x)).map(x=>NAMES[x]); return `<div class="crit"><b>${s.t}${ap.length?`<span style="font-weight:400;color:var(--muted);font-size:12.5px">　對應 ${ap.join('、')}</span>`:''}</b>${s.d}</div>`; }).join('');
+}
+function renderSummary(p){
+  const c=p.c, L=[], ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'}[c.marital];
+  L.push(`【${c.name}｜保險配置建議】`, `${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${fmt(c.income)} 萬`, `建議年繳約 ${wan(p.total)} 萬元（占年收入 ${fmt(c.income?p.total/c.income*100:0,1)}%，月均約 ${fmt(p.total*10000/12)} 元）`, '', '一、保障規劃');
+  p.items.forEach(i=>{ if (['na','off'].includes(i.status)) return; L.push(`・${NAMES[i.key]}：${i.label} ${wan(i.cover)} ${i.unit}，年繳約 ${wan(i.premium)} 萬${i.status==='deferred'?'（下階段補強）':i.status==='partial'?'（先部分配置）':''}`); });
+  const sv=['ann','div','inv'].filter(k=>p.sav[k]>0); let n=2;
+  if (sv.length){ L.push('','二、儲蓄規劃'); sv.forEach(k=>L.push(`・${NAMES[k]}：年繳 ${wan(p.sav[k])} 萬，繳費 ${p.payY} 年`)); L.push(`・中性情境 ${p.yrsToRet>0?c.retire:c.age+p.H} 歲累積約 ${wan(p.atRet.mid)} 萬元（非保證）`); n=3; }
+  if (p.reserve>0.05) L.push(`・保留彈性預算 ${wan(p.reserve)} 萬`);
+  const svcL=[];
+  if (c.smart==='yes') svcL.push('・客戶希望隨時查詢保障範圍：承保公司優先比較可用 LINE 即時說明保障內容者（如保誠人壽「保寶」）');
+  if (c.smart==='no') svcL.push('・客戶暫不需要 LINE 查詢保障，保單生效時再確認');
+  c.svc.forEach(k=>svcL.push(`・重視${SVC[k].t}`));
+  if (svcL.length){ L.push('',`${['','一','二','三'][n]}、售後服務`); L.push(...svcL); }
+  L.push('','※ 需求分析示意，保費為粗估值；實際以各公司條款、核保結果與正式建議書為準。宣告利率與分紅皆非保證。');
+  $('summary').textContent = L.join('\n');
+}
+function toast(m){ const el=$('toast'); el.textContent=m; el.style.opacity=1; clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity=0,1700); }
+function goTab(t){ S.tab=t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
+  const tb=$('tabs'); if (tb.getBoundingClientRect().top > 2) return; window.scrollTo({top: tb.offsetTop - 4, behavior:'smooth'}); }
+
+/* ===== wiring ===== */
+const STORIES = {
+  family:'陳先生 35 歲，已婚，兩個小孩，最小 3 歲，年收入 150 萬，每月開銷 6 萬，房貸 800 萬，存款 200 萬，公司團保壽險 100 萬，想先把家庭和醫療保障補齊，也想存小孩教育金，個性穩健。',
+  single:'林小姐 28 歲，單身，上班族，月薪 5 萬，每月開銷 3 萬，存款 50 萬，沒有任何保險，想做醫療保障，也想開始存退休金，可以承受一點波動，希望 60 歲退休，有問題希望能隨時用 LINE 查保障範圍。',
+  dink:'王先生 31 歲，新婚，跑外勤業務，年收入 100 萬，每月開銷 5 萬，房貸 600 萬，存款 150 萬，已經有實支實付醫療險，團保壽險 50 萬，想保障家人也存退休金，穩健，理賠希望方便一點。',
+  hnw:'張董 55 歲，已婚，小孩都成年了，年收入 300 萬，每月開銷 10 萬，資產 3000 萬，已有醫療險和壽險 500 萬，想做資產傳承跟退休規劃，個性保守，62 歲退休，希望有專人一站式服務。'
+};
+$('preset').addEventListener('change',e=>{ const s=STORIES[e.target.value]; if (s){ $('story').value=s; parseAndApply(); window.scrollTo({top:0,behavior:'smooth'}); } e.target.value=''; });
+['f','quick','smartSeg','svcChips','scen'].forEach(id=>{ $(id).addEventListener('change',render); });
+$('f').addEventListener('input',render);
+$('budgetR').addEventListener('input',e=>{ S.budget=+e.target.value; render(); });
+$('budgetAuto').addEventListener('click',()=>{ S.budget=null; render(); toast('已改用建議預算'); });
+$('smartSeg').addEventListener('change',()=>{ const v=radio('smart'); toast(v==='yes'?'已列出可用 LINE 查保障的壽險公司':v==='no'?'已記錄：客戶暫不需要':'已設為尚未詢問'); });
+$('tabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.t)));
+$('copyBtn').addEventListener('click',()=>{ const txt=$('summary').textContent, done=()=>toast('已複製建議摘要');
+  const fb=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){toast('請至「摘要」頁長按手動複製');} ta.remove(); };
+  try{ navigator.clipboard.writeText(txt).then(done,fb); }catch(e){ fb(); } });
+$('story').value = STORIES.family;
+parseAndApply();
+</script>
+</body>
+</html>
