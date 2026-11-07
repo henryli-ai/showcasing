@@ -711,20 +711,68 @@ $('clearStory').addEventListener('click',()=>{ $('story').value=''; $('parsed').
 
 /* ================= voice ================= */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec=null, listening=false, base='';
+const UA = navigator.userAgent;
+const IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const IS_MOBILE = IS_IOS || /Android/i.test(UA);
+const IN_APP = /Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(UA);
+const VMSG = {
+  zh:{ listening:'聆聽中…請說出客戶需求，說完按「停止」。', heard:'已收到語音，辨識中…', noRes:'還沒收到辨識結果。若一直沒反應，請改用鍵盤上的麥克風聽寫。',
+    'not-allowed':'麥克風權限被拒絕：請到瀏覽器的網站設定允許麥克風，或改用鍵盤上的麥克風聽寫。',
+    'service-not-allowed': IS_IOS ? 'iPhone 需要開啟「設定 › Siri」或「設定 › 一般 › 鍵盤 › 啟用聽寫」，網頁才能使用語音辨識；也可以直接用鍵盤上的麥克風聽寫。' : '此瀏覽器不允許網頁語音辨識，請改用鍵盤上的麥克風聽寫。',
+    network:'語音辨識需要網路連線，請確認網路後再試一次。', 'audio-capture':'找不到麥克風，或麥克風正被其他 App 使用。',
+    'language-not-supported':'此瀏覽器不支援這個語言的語音辨識，請改用鍵盤上的麥克風聽寫。', 'no-speech':'沒有聽到聲音，請靠近手機再說一次。',
+    other:'語音辨識中斷，請再試一次，或改用鍵盤上的麥克風聽寫。', inapp:'目前是在 LINE 等 App 內建瀏覽器開啟，語音辨識可能無法使用。請點右上角選單改用 Safari 或 Chrome 開啟，或用鍵盤上的麥克風聽寫。',
+    unsupported:'此瀏覽器不支援網頁語音辨識，請點手機鍵盤上的麥克風聽寫，文字出現後會自動辨識。', code:'代碼' },
+  en:{ listening:'Listening… describe the client, then tap Stop.', heard:'Got it, transcribing…', noRes:'No transcription yet. If nothing appears, use the microphone on your keyboard instead.',
+    'not-allowed':'Microphone access was denied. Allow it in the browser’s site settings, or use the microphone on your keyboard.',
+    'service-not-allowed': IS_IOS ? 'On iPhone, turn on Settings › Siri or Settings › General › Keyboard › Enable Dictation for web speech recognition, or use the microphone on your keyboard.' : 'This browser doesn’t allow web speech recognition. Use the microphone on your keyboard instead.',
+    network:'Speech recognition needs a network connection. Check it and try again.', 'audio-capture':'No microphone found, or another app is using it.',
+    'language-not-supported':'This browser can’t recognise this language. Use the microphone on your keyboard instead.', 'no-speech':'No speech detected. Move closer and try again.',
+    other:'Voice input stopped. Try again, or use the microphone on your keyboard.', inapp:'This page is open in an in-app browser (e.g. LINE), where voice input may not work. Open it in Safari or Chrome from the menu, or use the microphone on your keyboard.',
+    unsupported:'This browser doesn’t support web speech recognition. Tap the microphone on your keyboard to dictate; the text is read automatically.', code:'code' }
+};
+const V = k => VMSG[S.lang][k];
+let rec=null, listening=false, wantListen=false, base='', finalText='', lastErr=null, gotAny=false, noResTimer=null, restarts=0;
 function micUI(){ $('mic').classList.toggle('on',listening); $('micLabel').textContent = listening?T('micOn'):T('mic'); }
-function fallbackMic(){ $('story').focus(); $('micHint').innerHTML=T('micFallback'); toast(T('micToast')); }
+function micHint(msg, code){ $('micHint').innerHTML = `<b style="color:var(--ink)">${msg}</b>${code?` <span style="color:var(--muted)">（${V('code')}：${code}）</span>`:''}`; }
+function fallbackMic(key, code){ $('story').focus(); micHint(V(key||'unsupported'), code); }
+function stopListening(){ wantListen=false; clearTimeout(noResTimer); try{ rec && rec.stop(); }catch(e){} }
+function startRec(){
+  rec = new SR();
+  rec.lang = EN() ? 'en-US' : 'zh-TW';
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  rec.continuous = !IS_MOBILE;          // mobile engines are unreliable in continuous mode; we restart instead
+  lastErr = null;
+  rec.onstart = ()=>{ listening=true; micUI(); if (!gotAny) micHint(V('listening')); clearTimeout(noResTimer); noResTimer=setTimeout(()=>{ if (!gotAny && listening) micHint(V('noRes')); }, 8000); };
+  rec.onresult = e=>{
+    gotAny = true; let fin='', inter='';
+    for (let i=e.resultIndex; i<e.results.length; i++){ const r=e.results[i]; if (r.isFinal) fin += r[0].transcript; else inter += r[0].transcript; }
+    if (fin) finalText += fin + (EN() ? ' ' : '');
+    $('story').value = base + finalText + inter;
+    micHint(V('heard')); S.preset=null; clearTimeout(pt); pt=setTimeout(()=>parseAndApply(false),300);
+  };
+  rec.onerror = e=>{ lastErr = e.error || 'other'; };
+  rec.onend = ()=>{
+    clearTimeout(noResTimer);
+    const recoverable = !lastErr || lastErr==='no-speech';
+    if (wantListen && IS_MOBILE && recoverable && restarts < 20){ restarts++; try{ startRec(); return; }catch(err){} }
+    listening=false; wantListen=false; micUI();
+    if (lastErr && lastErr!=='aborted'){
+      const key = VMSG.zh[lastErr] ? lastErr : 'other';
+      if (lastErr==='no-speech' && gotAny) $('micHint').textContent = T('hintMic');
+      else fallbackMic(key, lastErr);
+    } else $('micHint').textContent = T('hintMic');
+    if ($('story').value.trim()) parseAndApply(false);
+  };
+  rec.start();
+}
 $('mic').addEventListener('click',()=>{
-  if (!SR) return fallbackMic();
-  if (listening){ try{rec.stop();}catch(e){} return; }
-  try{
-    rec=new SR(); rec.lang = EN() ? 'en-US' : 'zh-TW'; rec.interimResults=true; rec.continuous=true;
-    base=$('story').value.trim(); if (base && !/[，。,.]$/.test(base)) base += EN() ? '. ' : '，';
-    rec.onresult=e=>{ let s=''; for (let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; $('story').value=base+s; S.preset=null; clearTimeout(pt); pt=setTimeout(()=>parseAndApply(false),250); };
-    rec.onend=()=>{ listening=false; micUI(); parseAndApply(false); };
-    rec.onerror=e=>{ listening=false; micUI(); if (/not-allowed/.test(e.error)) fallbackMic(); else if (!/no-speech|aborted/.test(e.error)) toast(T('micErr')); };
-    rec.start(); listening=true; micUI();
-  }catch(e){ listening=false; micUI(); fallbackMic(); }
+  if (!SR) return fallbackMic(IN_APP ? 'inapp' : 'unsupported');
+  if (listening || wantListen){ stopListening(); return; }
+  base = $('story').value.trim(); if (base && !/[，。,.]$/.test(base)) base += EN() ? '. ' : '，';
+  finalText=''; gotAny=false; restarts=0; wantListen=true;
+  try{ startRec(); }catch(e){ wantListen=false; listening=false; micUI(); fallbackMic(IN_APP ? 'inapp' : 'other', e && e.name); }
 });
 
 /* ================= planning ================= */
