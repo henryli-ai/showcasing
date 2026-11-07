@@ -193,95 +193,98 @@ footer{font-size:11.5px;color:var(--muted);line-height:1.7;margin:22px 2px 0}
 .btn{border:1px solid var(--line2);background:var(--white);border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
 .btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
 .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+
+.label-row{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.label-row select{border:1px solid var(--line2);background:var(--white);border-radius:8px;padding:6px 8px;font-size:13px;margin-bottom:6px;max-width:48%}
+.seg.lang{min-height:34px;width:96px;flex:none}
+.seg.lang label{font-size:13px;font-weight:600}
+.ins-h,.ins-head{grid-template-columns:1fr repeat(4,34px) 16px}
+.mk{width:34px}
+html[lang=en] .tabs button{font-size:13.5px}
+html[lang=en] .hero .big b{font-size:34px}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div><div class="eyebrow">BROKER ADVISORY</div><h1>保險配置建議工作台</h1></div>
-    <select id="preset" aria-label="範例客戶">
-      <option value="">範例客戶</option>
-      <option value="family">雙薪小家庭</option>
-      <option value="single">單身上班族</option>
-      <option value="dink">新婚外勤族</option>
-      <option value="hnw">退休前高資產</option>
-    </select>
+    <div><div class="eyebrow">BROKER ADVISORY</div><h1 data-i="title"></h1></div>
+    <div class="seg lang" id="langSeg"><label><input type="radio" name="lang" value="zh"><span>中</span></label><label><input type="radio" name="lang" value="en"><span>EN</span></label></div>
   </div>
 
-  <!-- 1. Input -->
-  <div class="label">描述客戶需求（打字或語音）</div>
+  <div class="label-row"><div class="label" data-i="labInput"></div>
+    <select id="preset"><option value="" data-i="preset"></option><option value="family" data-i="pFamily"></option><option value="single" data-i="pSingle"></option><option value="dink" data-i="pDink"></option><option value="hnw" data-i="pHnw"></option></select>
+  </div>
   <div class="card input-card">
-    <textarea id="story" placeholder="例：陳先生 35 歲，已婚，兩個小孩最小 3 歲，年收入 150 萬，每月開銷 6 萬，房貸 800 萬…"></textarea>
+    <textarea id="story" data-iph="phStory"></textarea>
     <div class="input-tools">
-      <button class="mic" id="mic" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micLabel">語音輸入</span></button>
-      <button class="ghost" id="clearStory" type="button">清除</button>
+      <button class="mic" id="mic" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micLabel"></span></button>
+      <button class="ghost" id="clearStory" type="button" data-i="clear"></button>
     </div>
   </div>
-  <div class="hint" id="micHint">說完自動辨識，下方配置即時更新。</div>
+  <div class="hint" id="micHint" data-i="hintMic"></div>
   <div class="parsed" id="parsed"></div>
 
-  <!-- 2. Quick controls -->
-  <div class="label">即時調整</div>
+  <div class="label" data-i="labQuick"></div>
   <div class="card" id="quick">
     <div class="qrow">
-      <div class="qhead"><span>年繳保費預算</span><span class="val num" id="budgetVal"></span></div>
+      <div class="qhead"><span data-i="budget"></span><span class="val num" id="budgetVal"></span></div>
       <input type="range" id="budgetR" min="0" max="60" step="0.5">
-      <div class="range-foot"><span id="budgetNote"></span><button class="linkbtn" id="budgetAuto" type="button">用建議值</button></div>
+      <div class="range-foot"><span id="budgetNote"></span><button class="linkbtn" id="budgetAuto" type="button" data-i="useSuggested"></button></div>
     </div>
     <div class="qrow">
-      <div class="qhead"><span>風險屬性</span></div>
-      <div class="seg"><label><input type="radio" name="risk" value="c"><span>保守</span></label><label><input type="radio" name="risk" value="m"><span>穩健</span></label><label><input type="radio" name="risk" value="a"><span>積極</span></label></div>
+      <div class="qhead"><span data-i="risk"></span></div>
+      <div class="seg"><label><input type="radio" name="risk" value="c"><span data-i="rc"></span></label><label><input type="radio" name="risk" value="m"><span data-i="rm"></span></label><label><input type="radio" name="risk" value="a"><span data-i="ra"></span></label></div>
     </div>
     <div class="qrow">
-      <div class="qhead"><span>規劃目標</span></div>
+      <div class="qhead"><span data-i="goals"></span></div>
       <div class="chips">
-        <label class="chip"><input type="checkbox" name="goal" value="family">家庭保障</label>
-        <label class="chip"><input type="checkbox" name="goal" value="medical">醫療</label>
-        <label class="chip"><input type="checkbox" name="goal" value="retire">退休</label>
-        <label class="chip"><input type="checkbox" name="goal" value="edu">子女教育</label>
-        <label class="chip"><input type="checkbox" name="goal" value="legacy">傳承</label>
-        <label class="chip"><input type="checkbox" name="goal" value="save">儲蓄</label>
+        <label class="chip"><input type="checkbox" name="goal" value="family"><span data-i="gFamily"></span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="medical"><span data-i="gMedical"></span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="retire"><span data-i="gRetire"></span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="edu"><span data-i="gEdu"></span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="legacy"><span data-i="gLegacy"></span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="save"><span data-i="gSave"></span></label>
       </div>
     </div>
   </div>
 
   <details class="more">
-    <summary>細項資料（已依描述帶入）</summary>
+    <summary data-i="more"></summary>
     <div class="more-body">
+      <div class="hint" style="margin:0 0 10px" data-i="unitNote"></div>
       <form id="f" onsubmit="return false">
-        <div class="grp">基本資料</div>
+        <div class="grp" data-i="grpBasic"></div>
         <div class="grid2">
-          <div class="field" style="grid-column:1/-1"><label for="name">客戶稱呼</label><input type="text" id="name"></div>
-          <div class="field"><label for="age">年齡</label><div class="unit"><input type="number" inputmode="numeric" id="age"><span>歲</span></div></div>
-          <div class="field"><label>性別</label><div class="seg"><label><input type="radio" name="sex" value="M"><span>男</span></label><label><input type="radio" name="sex" value="F"><span>女</span></label></div></div>
-          <div class="field"><label for="marital">婚姻</label><select id="marital"><option value="single">單身</option><option value="married">已婚</option><option value="divorced">離婚／喪偶</option></select></div>
-          <div class="field"><label for="job">職業類別</label><select id="job"><option value="1">內勤</option><option value="2">外勤</option><option value="3">高風險</option></select></div>
-          <div class="field"><label for="kids">子女人數</label><div class="unit"><input type="number" inputmode="numeric" id="kids"><span>位</span></div></div>
-          <div class="field"><label for="youngest">最小子女</label><div class="unit"><input type="number" inputmode="numeric" id="youngest"><span>歲</span></div></div>
+          <div class="field" style="grid-column:1/-1"><label for="name" data-i="fName"></label><input type="text" id="name"></div>
+          <div class="field"><label for="age" data-i="fAge"></label><div class="unit"><input type="number" inputmode="numeric" id="age"><span data-i="uYr"></span></div></div>
+          <div class="field"><label data-i="fSex"></label><div class="seg"><label><input type="radio" name="sex" value="M"><span data-i="sM"></span></label><label><input type="radio" name="sex" value="F"><span data-i="sF"></span></label></div></div>
+          <div class="field"><label for="marital" data-i="fMarital"></label><select id="marital"><option value="single" data-i="mSingle"></option><option value="married" data-i="mMarried"></option><option value="divorced" data-i="mDivorced"></option></select></div>
+          <div class="field"><label for="job" data-i="fJob"></label><select id="job"><option value="1" data-i="j1"></option><option value="2" data-i="j2"></option><option value="3" data-i="j3"></option></select></div>
+          <div class="field"><label for="kids" data-i="fKids"></label><div class="unit"><input type="number" inputmode="numeric" id="kids"><span data-i="uKid"></span></div></div>
+          <div class="field"><label for="youngest" data-i="fYoungest"></label><div class="unit"><input type="number" inputmode="numeric" id="youngest"><span data-i="uYr"></span></div></div>
         </div>
-        <div class="grp">財務</div>
+        <div class="grp" data-i="grpFin"></div>
         <div class="grid2">
-          <div class="field"><label for="income">個人年收入</label><div class="unit"><input type="number" inputmode="decimal" id="income"><span>萬</span></div></div>
-          <div class="field"><label for="exp">家庭月支出</label><div class="unit"><input type="number" inputmode="decimal" id="exp" step="0.5"><span>萬</span></div></div>
-          <div class="field"><label for="debt">負債</label><div class="unit"><input type="number" inputmode="decimal" id="debt"><span>萬</span></div></div>
-          <div class="field"><label for="assets">可動用資產</label><div class="unit"><input type="number" inputmode="decimal" id="assets"><span>萬</span></div></div>
-          <div class="field"><label for="lifeHave">既有壽險保額</label><div class="unit"><input type="number" inputmode="decimal" id="lifeHave"><span>萬</span></div></div>
-          <div class="field"><label for="retire">退休年齡</label><div class="unit"><input type="number" inputmode="numeric" id="retire"><span>歲</span></div></div>
+          <div class="field"><label for="income" data-i="fIncome"></label><div class="unit"><input type="number" inputmode="decimal" id="income"><span data-i="uWan"></span></div></div>
+          <div class="field"><label for="exp" data-i="fExp"></label><div class="unit"><input type="number" inputmode="decimal" id="exp" step="0.5"><span data-i="uWan"></span></div></div>
+          <div class="field"><label for="debt" data-i="fDebt"></label><div class="unit"><input type="number" inputmode="decimal" id="debt"><span data-i="uWan"></span></div></div>
+          <div class="field"><label for="assets" data-i="fAssets"></label><div class="unit"><input type="number" inputmode="decimal" id="assets"><span data-i="uWan"></span></div></div>
+          <div class="field"><label for="lifeHave" data-i="fLifeHave"></label><div class="unit"><input type="number" inputmode="decimal" id="lifeHave"><span data-i="uWan"></span></div></div>
+          <div class="field"><label for="retire" data-i="fRetire"></label><div class="unit"><input type="number" inputmode="numeric" id="retire"><span data-i="uYr"></span></div></div>
         </div>
-        <div class="grp">既有保障</div>
-        <label class="check"><input type="checkbox" id="hasMed">已有實支實付醫療險</label>
-        <label class="check"><input type="checkbox" id="hasCI">已有重大傷病／癌症一次金</label>
-        <label class="check"><input type="checkbox" id="hasLTC">已有長照／失能險</label>
-        <div class="grp">試算假設</div>
+        <div class="grp" data-i="grpHave"></div>
+        <label class="check"><input type="checkbox" id="hasMed"><span data-i="hasMed"></span></label>
+        <label class="check"><input type="checkbox" id="hasCI"><span data-i="hasCI"></span></label>
+        <label class="check"><input type="checkbox" id="hasLTC"><span data-i="hasLTC"></span></label>
+        <div class="grp" data-i="grpAssume"></div>
         <div class="grid2">
-          <div class="field"><label for="rateA">利變年金宣告利率</label><div class="unit"><input type="number" inputmode="decimal" id="rateA" step="0.05" value="2.25"><span>%</span></div></div>
-          <div class="field"><label for="rateD">分紅中情境報酬</label><div class="unit"><input type="number" inputmode="decimal" id="rateD" step="0.1" value="3.0"><span>%</span></div></div>
+          <div class="field"><label for="rateA" data-i="fRateA"></label><div class="unit"><input type="number" inputmode="decimal" id="rateA" step="0.05" value="2.25"><span>%</span></div></div>
+          <div class="field"><label for="rateD" data-i="fRateD"></label><div class="unit"><input type="number" inputmode="decimal" id="rateD" step="0.1" value="3.0"><span>%</span></div></div>
         </div>
       </form>
     </div>
   </details>
 
-  <!-- 3. Hero -->
   <div class="hero">
     <div class="who num" id="who"></div>
     <div class="big num"><b id="bigTotal"></b><span id="bigSub"></span></div>
@@ -290,54 +293,53 @@ footer{font-size:11.5px;color:var(--muted);line-height:1.7;margin:22px 2px 0}
     <div class="mini num" id="mini"></div>
   </div>
 
-  <!-- 4. Tabs -->
   <nav class="tabs" id="tabs">
-    <button data-t="plan" class="on">配置</button>
-    <button data-t="gap">缺口</button>
-    <button data-t="proj">試算</button>
-    <button data-t="svc">服務<i class="bdg" id="svcBadge"></i></button>
-    <button data-t="sum">摘要</button>
+    <button data-t="plan" class="on" data-i="tPlan"></button>
+    <button data-t="gap" data-i="tGap"></button>
+    <button data-t="proj" data-i="tProj"></button>
+    <button data-t="svc"><span data-i="tSvc"></span><i class="bdg" id="svcBadge"></i></button>
+    <button data-t="sum" data-i="tSum"></button>
   </nav>
 
   <section class="panel on" id="p-plan">
     <div id="planNote"></div>
     <div id="prods"></div>
-    <div class="hint">點商品看規劃理由；右側開關可移除項目，預算會自動轉入儲蓄。</div>
+    <div class="hint" data-i="planHint"></div>
   </section>
 
   <section class="panel" id="p-gap">
     <div class="card"><div id="gaps"></div>
-      <div class="legend"><span><i class="sw" style="background:#9c9a93"></i>既有</span><span><i class="sw" style="background:#2a78d6"></i>本次補足</span><span><i class="sw" style="background:var(--soft);border:1px solid var(--line2)"></i>尚餘缺口</span></div>
+      <div class="legend"><span><i class="sw" style="background:#9c9a93"></i><span data-i="lgHave"></span></span><span><i class="sw" style="background:#2a78d6"></i><span data-i="lgAdd"></span></span><span><i class="sw" style="background:var(--soft);border:1px solid var(--line2)"></i><span data-i="lgRem"></span></span></div>
     </div>
   </section>
 
   <section class="panel" id="p-proj">
     <div class="card" id="projCard">
-      <div class="seg scen" id="scen"><label><input type="radio" name="scen" value="low"><span>保守</span></label><label><input type="radio" name="scen" value="mid" checked><span>中性</span></label><label><input type="radio" name="scen" value="high"><span>樂觀</span></label></div>
+      <div class="seg scen" id="scen"><label><input type="radio" name="scen" value="low"><span data-i="scLow"></span></label><label><input type="radio" name="scen" value="mid" checked><span data-i="scMid"></span></label><label><input type="radio" name="scen" value="high"><span data-i="scHigh"></span></label></div>
       <div class="legend" id="projLegend" style="margin:0 0 6px"></div>
       <div class="svgbox" id="projBox"></div>
       <div class="proj-stats num" id="projStats"></div>
     </div>
-    <div class="card" id="projEmpty" style="display:none;font-size:14px;color:var(--ink2)">本次配置未含儲蓄部位。勾選退休、子女教育、傳承或儲蓄目標，或拉高年繳預算即可試算。</div>
+    <div class="card" id="projEmpty" style="display:none;font-size:14px;color:var(--ink2)" data-i="projEmpty"></div>
   </section>
 
   <section class="panel" id="p-svc">
     <div class="card">
-      <p class="q">客戶需要隨時查保障範圍嗎？</p>
-      <p class="qsub">建議話術：「保單生效後，如果臨時想知道『這次住院有沒有賠』，您希望能直接用 LINE 問、馬上得到回覆嗎？」</p>
+      <p class="q" data-i="smartQ"></p>
+      <p class="qsub" data-i="smartScript"></p>
       <div class="seg crim" id="smartSeg">
-        <label><input type="radio" name="smart" value="yes"><span>需要</span></label>
-        <label><input type="radio" name="smart" value="no"><span>暫不需要</span></label>
-        <label><input type="radio" name="smart" value="unknown" checked><span>尚未詢問</span></label>
+        <label><input type="radio" name="smart" value="yes"><span data-i="smYes"></span></label>
+        <label><input type="radio" name="smart" value="no"><span data-i="smNo"></span></label>
+        <label><input type="radio" name="smart" value="unknown" checked><span data-i="smUnk"></span></label>
       </div>
       <div id="smartDyn"></div>
     </div>
-    <div class="label">其他在意的服務</div>
+    <div class="label" data-i="labOtherSvc"></div>
     <div class="card">
       <div class="chips" id="svcChips">
-        <label class="chip"><input type="checkbox" name="svc" value="claims">理賠申請方便</label>
-        <label class="chip"><input type="checkbox" name="svc" value="portal">線上查保單／借款</label>
-        <label class="chip"><input type="checkbox" name="svc" value="concierge">專人一站式服務</label>
+        <label class="chip"><input type="checkbox" name="svc" value="claims"><span data-i="svClaims"></span></label>
+        <label class="chip"><input type="checkbox" name="svc" value="portal"><span data-i="svPortal"></span></label>
+        <label class="chip"><input type="checkbox" name="svc" value="concierge"><span data-i="svConcierge"></span></label>
       </div>
       <div id="svcDyn"></div>
     </div>
@@ -347,20 +349,16 @@ footer{font-size:11.5px;color:var(--muted);line-height:1.7;margin:22px 2px 0}
     <div class="card"><pre class="summary" id="summary"></pre></div>
   </section>
 
-  <footer>
-    本工具為需求分析示意，保費為依年齡與保額之粗估值，實際以各保險公司商品條款、核保結果及正式建議書為準。宣告利率與分紅皆非保證；投資型保單投資風險由要保人承擔。正式招攬前須完成適合度評估（KYC）並遵循招攬與錄音錄影規範。各公司服務功能依公開資訊整理，以其官方最新服務為準。
-  </footer>
+  <footer data-i="footer"></footer>
 </div>
 
-<div class="actions"><div class="in"><div class="sum num" id="barSum"></div><button class="btn dark" id="copyBtn" type="button">複製摘要</button></div></div>
+<div class="actions"><div class="in"><div class="sum num" id="barSum"></div><button class="btn dark" id="copyBtn" type="button" data-i="copy"></button></div></div>
 <div class="toast" id="toast"></div>
-
 <script>
 const $ = id => document.getElementById(id);
 const HEX = {life:'#2a78d6',med:'#eb6834',ci:'#1baf7a',acc:'#eda100',ltc:'#e87ba4',ann:'#008300',div:'#6250d6',inv:'#e34948',reserve:'#c9c7c0'};
-const NAMES = {life:'定期壽險',med:'醫療實支實付',ci:'重大傷病／癌症',acc:'意外傷害',ltc:'長照失能',ann:'利變年金',div:'分紅保單',inv:'投資型保單',reserve:'保留彈性預算'};
-const fmt = (n,d=0) => Number(n).toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d});
-const wan = n => n >= 100 ? fmt(Math.round(n)) : Number(n).toLocaleString('zh-TW',{maximumFractionDigits:n<10?1:0});
+const fmt = (n,d=0) => Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const wan = n => n >= 100 ? fmt(Math.round(n)) : Number(n).toLocaleString('en-US',{maximumFractionDigits:n<10?1:0});
 const r10 = n => Math.round(n/10)*10;
 const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
 const num = (id,def=0) => { const v = parseFloat($(id).value); return isNaN(v) ? def : v; };
@@ -368,10 +366,179 @@ const radio = n => (document.querySelector(`input[name="${n}"]:checked`)||{}).va
 const CHEV = '<svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>';
 const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
 
-/* ===== state ===== */
-const S = { budget:null, off:new Set(), open:new Set(), tab:'plan', openIns:new Set() };
+/* ================= language ================= */
+const S = { budget:null, off:new Set(), open:new Set(), openIns:new Set(), tab:'plan', lang:'zh', preset:'family', lastParse:null };
+const EN = () => S.lang === 'en';
+/* money: internal unit is 萬 (NT$10,000) */
+const M = n => EN() ? (()=>{ const v=n*10000; if (v>=1e6){ const x=v/1e6; return 'NT$'+(x>=10?fmt(x,0):fmt(x,1).replace(/\.0$/,''))+'M'; } return 'NT$'+fmt(Math.round(v/1000))+'k'; })() : `${wan(n)} 萬`;
+const MT = n => EN() ? 'NT$'+fmt(Math.round(n*10000)) : `${fmt(n*10000)} 元`;  // exact NT$
 
-/* ===== parser ===== */
+const I = {
+ zh:{
+  title:'保險配置建議工作台', labInput:'描述客戶需求（打字或語音）', preset:'範例客戶', pFamily:'雙薪小家庭', pSingle:'單身上班族', pDink:'新婚外勤族', pHnw:'退休前高資產',
+  phStory:'例：陳先生 35 歲，已婚，兩個小孩最小 3 歲，年收入 150 萬，每月開銷 6 萬，房貸 800 萬…', mic:'語音輸入', micOn:'聆聽中・點擊停止', clear:'清除',
+  hintMic:'說完自動辨識，下方配置即時更新。', micFallback:'<b style="color:var(--ink)">此環境無法直接收音</b>：請點手機鍵盤上的麥克風聽寫，文字出現後自動辨識。', micToast:'請改用鍵盤上的麥克風聽寫', micErr:'語音辨識中斷，請再試一次',
+  labQuick:'即時調整', budget:'年繳保費預算', perYr:'／年', budgetAuto:p=>`建議值：年收入 ${p}%`, budgetSug:v=>`建議值 ${v}`, useSuggested:'用建議值', toastSug:'已改用建議預算',
+  risk:'風險屬性', rc:'保守', rm:'穩健', ra:'積極', goals:'規劃目標', gFamily:'家庭保障', gMedical:'醫療', gRetire:'退休', gEdu:'子女教育', gLegacy:'傳承', gSave:'儲蓄',
+  more:'細項資料（已依描述帶入）', unitNote:'金額單位：萬元', grpBasic:'基本資料', fName:'客戶稱呼', fAge:'年齡', fSex:'性別', sM:'男', sF:'女', fMarital:'婚姻', mSingle:'單身', mMarried:'已婚', mDivorced:'離婚／喪偶',
+  fJob:'職業類別', j1:'內勤', j2:'外勤', j3:'高風險', fKids:'子女人數', fYoungest:'最小子女', uYr:'歲', uKid:'位', uWan:'萬',
+  grpFin:'財務', fIncome:'個人年收入', fExp:'家庭月支出', fDebt:'負債', fAssets:'可動用資產', fLifeHave:'既有壽險保額', fRetire:'退休年齡',
+  grpHave:'既有保障', hasMed:'已有實支實付醫療險', hasCI:'已有重大傷病／癌症一次金', hasLTC:'已有長照／失能險', grpAssume:'試算假設', fRateA:'利變年金宣告利率', fRateD:'分紅中情境報酬',
+  tPlan:'配置', tGap:'缺口', tProj:'試算', tSvc:'服務', tSum:'摘要', planHint:'點商品看規劃理由；右側開關可移除項目，預算會自動轉入儲蓄。',
+  lgHave:'既有', lgAdd:'本次補足', lgRem:'尚餘缺口', scLow:'保守', scMid:'中性', scHigh:'樂觀',
+  projEmpty:'本次配置未含儲蓄部位。勾選退休、子女教育、傳承或儲蓄目標，或拉高年繳預算即可試算。',
+  smartQ:'客戶需要隨時查保障範圍嗎？', smartScript:'建議話術：「保單生效後，如果臨時想知道『這次住院有沒有賠』，您希望能直接用 LINE 問、馬上得到回覆嗎？」',
+  smYes:'需要', smNo:'暫不需要', smUnk:'尚未詢問', labOtherSvc:'其他在意的服務', svClaims:'理賠申請方便', svPortal:'線上查保單／借款', svConcierge:'專人一站式服務',
+  footer:'本工具為需求分析示意，保費為依年齡與保額之粗估值，實際以各保險公司商品條款、核保結果及正式建議書為準。宣告利率與分紅皆非保證；投資型保單投資風險由要保人承擔。正式招攬前須完成適合度評估（KYC）並遵循招攬與錄音錄影規範。各公司服務功能依公開資訊整理，以其官方最新服務為準。',
+  copy:'複製摘要', copied:'已複製建議摘要', copyFail:'請至「摘要」頁長按手動複製',
+  marital:{single:'單身',married:'已婚',divorced:'離婚／喪偶'},
+  who:(c,ms)=>`${c.name}・${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${M(c.income)}`,
+  bigSub:t=>`萬元／年・月均 ${MT(t/12)}`, capBase:(p,s,r)=>`保障 <b>${p}%</b>・儲蓄 <b>${s}%</b>${r?`・保留 <b>${r}%</b>`:''}　<span style="color:var(--muted)">點色塊看明細</span>`,
+  capItem:(n,a,pc)=>`<b>${n}</b>　年繳 ${a}・${pc}%`, mIncome:'占年收入', mGap:'缺口補足', mGapV:(a,b)=>`${a}／${b} 項`, mRet:'退休準備率',
+  bar:(t,c)=>`<b>年繳約 ${M(t)}</b>月均 ${MT(t/12)}・占收入 ${c}%`,
+  names:{life:'定期壽險',med:'醫療實支實付',ci:'重大傷病／癌症',acc:'意外傷害',ltc:'長照失能',ann:'利變年金',div:'分紅保單',inv:'投資型保單',reserve:'保留彈性預算'},
+  lab:{life:'保額',med:'雜費限額',ci:'一次金',acc:'保額',ltc:'月給付'}, perMo:'/月',
+  tagNA:'不適用', tagOver:'預算外', tagSave:'儲蓄', amtPrem:'年繳', amtOff:'已移除', amtLater:'下階段', partial:'（先部分配置）', savSub:y=>`儲蓄配置・繳 ${y} 年`,
+  reserveSub:'尚未提到儲蓄目標，先保留', amtYear:'年度',
+  shortfall:b=>`預算 ${b} 不足以一次補足全部缺口，已依優先順序配置；可拉高上方預算，或於加薪、房貸遞減時補上「預算外」項目。`,
+  askNote:'還沒確認客戶是否需要<b>隨時查保障範圍</b>', askGo:'去詢問 →', tOn:n=>`已納入${n}`, tOff:n=>`已移除${n}，預算轉入其他項目`,
+  rs:{
+   lifeNoDep:'目前無扶養責任，保留負債與身後費用即可，列為視預算項目。',
+   life:(need,parts,have,gap)=>`家庭責任需求 ${need}（${parts}），扣除既有 ${have} 後缺口 ${gap}；以定期壽險補足，保費效率最高。`,
+   lifeParts:{debt:v=>`負債 ${v}`, sup:n=>`${n} 年家庭生活費`, edu:v=>`子女教育 ${v}`, sep:'、'}, lifePartial:v=>`受預算限制先配置 ${v}。`,
+   med:'承接健保以外的自費醫材、病房差額與手術費用，建議雜費限額 30 萬元，搭配住院日額 3,000 元。',
+   ci:x=>`確診重大傷病或癌症時給付一次金，約 ${x} 年收入，支應治療期間收入中斷與自費療程。`,
+   acc:(j,f)=>`${['','內勤職業','外勤職業','高風險職業'][j]}，規劃意外身故／失能保障並附加意外實支實付${f?'；外勤職類列為必要保障':''}。`,
+   ltc:o=>`${o?'已進入失能風險上升期，':'年輕投保可鎖定較低費率，'}失能時每月給付 3 萬元。`,
+   ann:(r,y,rate)=>`累積${r?'退休金':'中長期資金'}，${y} 年繳費，假設宣告利率 ${rate}%（非保證），退休後可轉年金給付。`,
+   div:l=>`兼具保證給付與分紅潛力，${l?'可指定受益人做為資產傳承工具':'適合中長期穩健儲蓄'}；分紅非保證。`,
+   inv:'依積極屬性少量配置，參與市場成長；須另行揭露投資風險並完成適合度評估。', na:'65 歲以上定期壽險承保受限，改以分紅／終身型保單處理。'
+  },
+  svcSmart:'<b>服務搭配</b>這類保單條款細，客戶出險時最常問「有沒有賠」。選承保公司時，可優先比較能用 LINE 即時說明保障內容者（見「服務」頁）。',
+  svcOther:t=>`<b>服務搭配</b>客戶在意「${t}」，選承保公司時一併比較（見「服務」頁）。`,
+  gaps:{life:'壽險',med:'醫療實支',ci:'重大傷病',acc:'意外傷害',ltc:'長照失能'}, gapSub:{life:n=>`${n} 年家庭責任`,med:'雜費限額',ci:'約 2 年收入',acc:'約 5 年收入',ltc:'每月給付'},
+  need:'需求', noNeed:'無需求', covered:'已補足', short:v=>`尚缺 ${v}`,
+  lgValue:s=>`${s}情境保單價值`, lgPaid:'累積已繳', lgNeed:'退休需求', needLine:v=>`退休需求 ${v}`, ageTick:a=>`${a}歲`, axisUnit:'萬元', tipAge:a=>`${a} 歲`, tipRange:'區間', tipPaid:'已繳',
+  stAt:(a,s)=>`${a} 歲・${s}`, stPaid:'累積已繳', stNeed:'退休需求', stRange:'保守～樂觀',
+  smUnkNote:'選「需要」後，會列出可在 LINE 查詢保障的壽險公司比較。', smNoNote:'已記錄：客戶暫不需要。建議於保單生效、寄送保單時再問一次；隨時可改選「需要」。',
+  fitbar:p=>`依「保障內容可即時說明」排序${p?`，對應本次 ${p}`:''}：`, insHead:'壽險公司・LINE 服務', cols:['保障內容','保單繳費','借款試算','理賠'],
+  ch:'管道', src:'來源', demo:'依本次配置示意', insFoot:'● 公開資料明確列出該功能　○ 公開資料未明確列出（不代表沒有）。各公司服務持續更新，建議向客戶說明前以官方資訊確認。',
+  map:'對應', toastYes:'已列出可用 LINE 查保障的壽險公司', toastNo:'已記錄：客戶暫不需要', toastUnk:'已設為尚未詢問',
+  chat:{q1:'我住院開刀，保單可以賠哪些？', a1:'依您的醫療實支實付：住院自費醫材、病房差額等雜費，限額 30 萬元內實支實付；另有住院日額每日 3,000 元。', a1h:'依您持有的實支實付醫療險，住院雜費與手術費用於條款限額內實支實付。', a1n:'目前規劃未含醫療實支實付，住院費用以健保給付為主，建議與您的保險顧問討論。', q2:'如果確診癌症呢？', a2:v=>`確診且符合重大傷病條款定義，可一次給付 ${v}。實際以保單條款及理賠審核為準。`},
+  sum:{
+   head:n=>`【${n}｜保險配置建議】`, prof:(c,ms)=>`${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${M(c.income)}`,
+   total:(t,pc)=>`建議年繳約 ${M(t)}（占年收入 ${pc}%，月均約 ${MT(t/12)}）`, prot:'一、保障規劃', sav:'二、儲蓄規劃', svc:n=>`${['','一','二','三'][n]}、售後服務`,
+   item:(n,l,v,p,st)=>`・${n}：${l} ${v}，年繳約 ${p}${st}`, later:'（下階段補強）', part:'（先部分配置）', savItem:(n,p,y)=>`・${n}：年繳 ${p}，繳費 ${y} 年`, savMid:(a,v)=>`・中性情境 ${a} 歲累積約 ${v}（非保證）`, reserve:v=>`・保留彈性預算 ${v}`,
+   smYes:'・客戶希望隨時查詢保障範圍：承保公司優先比較可用 LINE 即時說明保障內容者（如保誠人壽「保寶」）', smNo:'・客戶暫不需要 LINE 查詢保障，保單生效時再確認', svcItem:t=>`・重視${t}`,
+   note:'※ 需求分析示意，保費為粗估值；實際以各公司條款、核保結果與正式建議書為準。宣告利率與分紅皆非保證。'
+  },
+  pchip:{age:a=>`${a} 歲`, kids:(k,y)=>k?`子女 ${k} 位${y!=null?`・最小 ${y} 歲`:''}`:'無子女', jobs:['','內勤','外勤','高風險職業'], income:v=>`年收入 ${v}`, exp:v=>`月支出 ${v}`, debt:v=>`負債 ${v}`, assets:v=>`資產 ${v}`, budget:v=>`預算 ${v}/年`, life:v=>v?`既有壽險 ${v}`:'無既有保險', med:'已有實支', ci:'已有重疾', ltc:'已有長照', retire:a=>`${a} 歲退休`, risk:{c:'保守型',m:'穩健型',a:'積極型'}, smYes:'想隨時查保障', smNo:'暫不需 LINE 查詢', missLab:'尚未提到，可補問：', miss:{age:'年齡',income:'年收入',exp:'月支出',debt:'負債／資產',have:'既有保障'}}
+ },
+ en:{
+  title:'Insurance Planning Console', labInput:'Describe the client (type or speak)', preset:'Sample client', pFamily:'Young family', pSingle:'Single professional', pDink:'Newlywed, field job', pHnw:'Pre-retiree, HNW',
+  phStory:'e.g. Mr. Chen, 35, married with two kids, youngest is 3. Income NT$1.5M a year, spends NT$60k a month, NT$8M mortgage…', mic:'Voice input', micOn:'Listening · tap to stop', clear:'Clear',
+  hintMic:'Details are picked up as you finish, and the plan below updates instantly.', micFallback:'<b style="color:var(--ink)">The mic can’t be used here.</b> Tap the microphone on your phone keyboard to dictate; the text is read automatically.', micToast:'Use the microphone on your keyboard instead', micErr:'Voice input stopped, please try again',
+  labQuick:'Adjust live', budget:'Annual premium budget', perYr:'/yr', budgetAuto:p=>`Suggested: ${p}% of income`, budgetSug:v=>`Suggested ${v}`, useSuggested:'Use suggested', toastSug:'Switched to the suggested budget',
+  risk:'Risk profile', rc:'Conservative', rm:'Balanced', ra:'Growth', goals:'Goals', gFamily:'Family protection', gMedical:'Medical', gRetire:'Retirement', gEdu:'Education', gLegacy:'Legacy', gSave:'Savings',
+  more:'Client details (filled from the description)', unitNote:'Amounts in NT$10,000 (萬). For example, 150 = NT$1.5M.', grpBasic:'Basics', fName:'Client name', fAge:'Age', fSex:'Sex', sM:'Male', sF:'Female', fMarital:'Marital status', mSingle:'Single', mMarried:'Married', mDivorced:'Divorced / widowed',
+  fJob:'Occupation', j1:'Office', j2:'Field', j3:'High-risk', fKids:'Children', fYoungest:'Youngest child', uYr:'yrs', uKid:'', uWan:'×10k',
+  grpFin:'Finances', fIncome:'Annual income', fExp:'Monthly household spend', fDebt:'Debt', fAssets:'Liquid assets', fLifeHave:'Existing life cover', fRetire:'Retirement age',
+  grpHave:'Existing cover', hasMed:'Has medical reimbursement cover', hasCI:'Has critical illness / cancer lump sum', hasLTC:'Has long-term care / disability cover', grpAssume:'Assumptions', fRateA:'Annuity declared rate', fRateD:'Participating mid-case return',
+  tPlan:'Plan', tGap:'Gaps', tProj:'Growth', tSvc:'Service', tSum:'Summary', planHint:'Tap a policy for the rationale. Switch one off to remove it; its budget moves into savings.',
+  lgHave:'Existing', lgAdd:'Added now', lgRem:'Remaining gap', scLow:'Low', scMid:'Mid', scHigh:'High',
+  projEmpty:'This plan has no savings component. Select retirement, education, legacy or savings, or raise the budget, to see a projection.',
+  smartQ:'Does the client want to check their coverage anytime?', smartScript:'Suggested line: “Once the policy is in force, if you suddenly want to know whether a hospital stay is covered, would you like to just ask on LINE and get an instant answer?”',
+  smYes:'Yes', smNo:'Not now', smUnk:'Not asked', labOtherSvc:'Other service priorities', svClaims:'Easy claims', svPortal:'Online policy & loans', svConcierge:'Dedicated concierge',
+  footer:'Illustrative needs analysis. Premiums are rough estimates by age and cover; actual terms follow each insurer’s policy wording, underwriting and formal proposal. Declared rates and dividends are not guaranteed, and investment-linked risk is borne by the policyholder. Complete a suitability (KYC) assessment and follow sales and recording rules before any formal sale. Insurer service features are compiled from public information; check each insurer’s latest official services.',
+  copy:'Copy summary', copied:'Summary copied', copyFail:'Open the Summary tab and long-press to copy',
+  marital:{single:'Single',married:'Married',divorced:'Divorced / widowed'},
+  who:(c,ms)=>`${c.name} · ${c.age} · ${ms} · ${c.kids} ${c.kids===1?'child':'children'} · income ${M(c.income)}`,
+  bigSub:t=>`per year · ${MT(t/12)}/month`, capBase:(p,s,r)=>`Protection <b>${p}%</b> · Savings <b>${s}%</b>${r?` · Reserve <b>${r}%</b>`:''}　<span style="color:var(--muted)">Tap a segment</span>`,
+  capItem:(n,a,pc)=>`<b>${n}</b>　${a}/yr · ${pc}%`, mIncome:'Of income', mGap:'Gaps covered', mGapV:(a,b)=>`${a} of ${b}`, mRet:'Retirement ready',
+  bar:(t,c)=>`<b>About ${M(t)}/yr</b>${MT(t/12)}/month · ${c}% of income`,
+  names:{life:'Term life',med:'Medical reimbursement',ci:'Critical illness / cancer',acc:'Accident',ltc:'Long-term care',ann:'Savings annuity',div:'Participating policy',inv:'Investment-linked',reserve:'Flexible reserve'},
+  lab:{life:'Cover',med:'Expense limit',ci:'Lump sum',acc:'Cover',ltc:'Benefit'}, perMo:'/mo',
+  tagNA:'N/A', tagOver:'Over budget', tagSave:'Savings', amtPrem:'Premium', amtOff:'Removed', amtLater:'Later', partial:' (partial for now)', savSub:y=>`Savings · ${y}-year pay`,
+  reserveSub:'No savings goal yet, held back', amtYear:'Per year',
+  shortfall:b=>`A ${b} budget can’t close every gap at once, so items are funded by priority. Raise the budget above, or add the “over budget” items after a pay rise or as the mortgage falls.`,
+  askNote:'You haven’t asked whether the client wants to <b>check coverage anytime</b>', askGo:'Ask now →', tOn:n=>`${n} added`, tOff:n=>`${n} removed, budget reallocated`,
+  rs:{
+   lifeNoDep:'No dependants, so only debt and final expenses need cover. Treated as optional.',
+   life:(need,parts,have,gap)=>`Family need is ${need} (${parts}). After existing cover of ${have}, the gap is ${gap}; term life closes it most cost-effectively.`,
+   lifeParts:{debt:v=>`debt ${v}`, sup:n=>`${n} years of living costs`, edu:v=>`education ${v}`, sep:', '}, lifePartial:v=>` The budget allows ${v} for now.`,
+   med:'Covers what National Health Insurance doesn’t: out-of-pocket supplies, ward upgrades and surgery. Suggest a NT$300k expense limit plus NT$3,000 a day in hospital.',
+   ci:x=>`Pays a lump sum on diagnosis of a critical illness or cancer, about ${x} years of income, to bridge lost earnings and self-paid treatment.`,
+   acc:(j,f)=>`${['','Office job','Field job','High-risk job'][j]}: accidental death and disability cover plus accident medical reimbursement${f?'; essential for field occupations':''}.`,
+   ltc:o=>`${o?'Disability risk rises from this age; ':'Locks in a lower rate while young; '}pays NT$30k a month on disability.`,
+   ann:(r,y,rate)=>`Builds ${r?'retirement income':'medium- to long-term funds'} over a ${y}-year pay period at an assumed ${rate}% declared rate (not guaranteed). Can convert to annuity payments at retirement.`,
+   div:l=>`Guaranteed benefits plus dividend upside; ${l?'beneficiaries can be named for wealth transfer':'suits steady long-term saving'}. Dividends are not guaranteed.`,
+   inv:'A small allocation for a growth profile to capture market upside; needs separate risk disclosure and a suitability assessment.', na:'Term life is restricted above age 65; handle the gap with participating or whole-life cover.'
+  },
+  svcSmart:'<b>Service fit</b>These policies have detailed terms, and a client’s first question at claim time is usually “am I covered?”. Favour insurers that can explain coverage instantly on LINE (see Service).',
+  svcOther:t=>`<b>Service fit</b>The client values “${t}”. Compare insurers on this too (see Service).`,
+  gaps:{life:'Life',med:'Medical',ci:'Critical illness',acc:'Accident',ltc:'Long-term care'}, gapSub:{life:n=>`${n} yrs of family duty`,med:'expense limit',ci:'~2 yrs of income',acc:'~5 yrs of income',ltc:'monthly benefit'},
+  need:'need', noNeed:'No need', covered:'Covered', short:v=>`Short ${v}`,
+  lgValue:s=>`${s} case policy value`, lgPaid:'Premiums paid', lgNeed:'Retirement need', needLine:v=>`Retirement need ${v}`, ageTick:a=>`${a}`, axisUnit:'NT$', tipAge:a=>`Age ${a}`, tipRange:'Range', tipPaid:'Paid',
+  stAt:(a,s)=>`Age ${a} · ${s}`, stPaid:'Premiums paid', stNeed:'Retirement need', stRange:'Low – high',
+  smUnkNote:'Choose “Yes” to compare insurers whose LINE service can answer coverage questions.', smNoNote:'Recorded: not needed for now. Ask again when the policy is issued; you can switch to “Yes” at any time.',
+  fitbar:p=>`Ranked by ability to explain coverage instantly${p?`, relevant to this plan’s ${p}`:''}:`, insHead:'Insurer · LINE service', cols:['Cover','Policy','Loan','Claim'],
+  ch:'Channels', src:'Source', demo:'illustration for this plan', insFoot:'● Feature stated in public sources　○ Not stated in public sources (this does not mean it’s unavailable). Services change; confirm with each insurer before presenting to clients.',
+  map:'Applies to', toastYes:'Insurers with LINE coverage answers listed', toastNo:'Recorded: not needed for now', toastUnk:'Set to not asked',
+  chat:{q1:'I’m having surgery in hospital. What does my policy cover?', a1:'Under your medical reimbursement cover, out-of-pocket supplies, ward upgrades and other expenses are reimbursed up to NT$300k, plus NT$3,000 a day in hospital.', a1h:'Under your existing medical reimbursement policy, hospital expenses and surgery are reimbursed up to the policy limits.', a1n:'Your plan doesn’t include medical reimbursement yet, so hospital costs fall mainly on National Health Insurance. Please talk to your adviser.', q2:'What if I’m diagnosed with cancer?', a2:v=>`If the diagnosis meets the critical illness definition, a lump sum of ${v} is paid. Final terms follow the policy wording and claim review.`},
+  sum:{
+   head:n=>`${n} | Insurance plan`, prof:(c,ms)=>`${c.age} · ${ms} · ${c.kids} ${c.kids===1?'child':'children'} · income ${M(c.income)}`,
+   total:(t,pc)=>`Suggested premium about ${M(t)} a year (${pc}% of income, about ${MT(t/12)} a month)`, prot:'1. Protection', sav:'2. Savings', svc:n=>`${n}. After-sales service`,
+   item:(n,l,v,p,st)=>`• ${n}: ${l.toLowerCase()} ${v}, premium about ${p}/yr${st}`, later:' (next stage)', part:' (partial for now)', savItem:(n,p,y)=>`• ${n}: ${p}/yr for ${y} years`, savMid:(a,v)=>`• Mid case at age ${a}: about ${v} (not guaranteed)`, reserve:v=>`• Flexible reserve ${v}`,
+   smYes:'• Client wants to check coverage anytime: favour insurers whose LINE service explains coverage instantly (e.g. PCA Life’s 保寶 assistant)', smNo:'• Client doesn’t need LINE coverage answers for now; confirm again at policy issue', svcItem:t=>`• Values ${t.toLowerCase()}`,
+   note:'Illustrative needs analysis with estimated premiums; actual terms follow each insurer’s wording, underwriting and formal proposal. Declared rates and dividends are not guaranteed.'
+  },
+  pchip:{age:a=>`Age ${a}`, kids:(k,y)=>k?`${k} ${k===1?'child':'children'}${y!=null?` · youngest ${y}`:''}`:'No children', jobs:['','Office','Field','High-risk job'], income:v=>`Income ${v}`, exp:v=>`Spend ${v}/mo`, debt:v=>`Debt ${v}`, assets:v=>`Assets ${v}`, budget:v=>`Budget ${v}/yr`, life:v=>v?`Life cover ${v}`:'No insurance', med:'Has medical', ci:'Has CI', ltc:'Has LTC', retire:a=>`Retire at ${a}`, risk:{c:'Conservative',m:'Balanced',a:'Growth'}, smYes:'Wants coverage answers anytime', smNo:'No LINE need', missLab:'Not mentioned yet, worth asking:', miss:{age:'Age',income:'Income',exp:'Monthly spend',debt:'Debt / assets',have:'Existing cover'}}
+ }
+};
+const T = k => I[S.lang][k];
+const NAME = k => T('names')[k];
+
+const INSURERS = [
+  {zh:{name:'保誠人壽', bot:'智能客服「保寶」', ch:'LINE 官方帳號・官網・FB', note:'可詢問保單內容、網路投保、保費查詢及理賠；以多年客服常見問題設計約 500 個情境問題。', src:'保誠人壽新聞稿（2019）；2026 年春節服務公告仍列為 LINE 服務管道'},
+   en:{name:'PCA Life', bot:'AI assistant 保寶 (Bao Bao)', ch:'LINE official account · website · Facebook', note:'Answers questions on policy contents, online purchase, premiums and claims; built on about 500 scenarios drawn from years of contact-centre queries.', src:'PCA Life press release (2019); still listed as a LINE channel in Feb 2026'}, cap:[1,1,0,1]},
+  {zh:{name:'南山人壽', bot:'智能客服「透透 Talk Talk」', ch:'官方 LINE・官網・保戶園地・APP', note:'保單狀態、繳費、近期應領，借還款與解約金試算，保單變更與處理進度；NLU 結合 LLM，複雜問題轉真人文字客服。', src:'南山人壽保戶通知；iThome（2025）'},
+   en:{name:'Nan Shan Life', bot:'AI assistant 透透 Talk Talk', ch:'Official LINE · website · policyholder portal · app', note:'Policy status, payments and upcoming payouts, loan and surrender-value estimates, policy changes and progress; NLU plus LLM, with handoff to live chat.', src:'Nan Shan policyholder notice; iThome (2025)'}, cap:[0,1,1,0]},
+  {zh:{name:'國泰人壽', bot:'智能客服「阿發」', ch:'LINE 官方帳號・官網・APP', note:'查詢保單現況、繳費紀錄，申請保單貸款，查詢所屬業務員。', src:'ETtoday、iThome（2018）'},
+   en:{name:'Cathay Life', bot:'Chatbot 阿發 (Alpha)', ch:'LINE official account · website · app', note:'Policy status, payment history, policy loan applications and finding your agent.', src:'ETtoday, iThome (2018)'}, cap:[0,1,1,0]},
+  {zh:{name:'富邦人壽', bot:'「富邦FUBON」LINE 個人化服務', ch:'富邦金控共用 LINE 官方帳號', note:'綁定後可收理賠、保險給付與保單借還款等案件受理進度通知；另有電話智能語音客服查詢保單。', src:'富邦金控（2025）；富邦人壽官網'},
+   en:{name:'Fubon Life', bot:'Fubon LINE personalised service', ch:'Shared Fubon Financial LINE account', note:'Once linked, sends progress notices for claims, benefit payouts and policy loans; a separate phone voice bot handles policy lookups.', src:'Fubon Financial (2025); Fubon Life website'}, cap:[0,0,1,1]},
+  {zh:{name:'新光人壽', bot:'LINE 官方帳號個人化服務', ch:'LINE 官方帳號・APP', note:'保單／借款查詢、個人權益通知推播；業界較早推出 LINE 個人化保險服務。', src:'數位時代、今周刊（2019–2021）'},
+   en:{name:'Shin Kong Life', bot:'LINE personalised service', ch:'LINE official account · app', note:'Policy and loan lookups and personalised notifications; an early mover in personalised LINE insurance service.', src:'Business Next, Business Today (2019–2021)'}, cap:[0,1,1,0]}
+];
+const SVC = {
+  claims:{keys:['med','acc','ci'], zh:{t:'理賠申請便利', d:'實支實付與意外險屬高頻理賠險種。可比較是否支援「理賠聯盟鏈」線上申請（多家公司參與，資料可同步轉送）及其他送件管道，例如保誠人壽可透過 7-ELEVEN ibon 24 小時申請。'},
+    en:{t:'Easy claims', d:'Medical reimbursement and accident cover are claimed often. Compare support for the industry claims-sharing network 理賠聯盟鏈 (file online, forwarded to other insurers) and other channels; PCA Life, for example, takes claims 24/7 at 7-ELEVEN ibon kiosks.'}},
+  portal:{keys:['ann','div','inv'], zh:{t:'線上查保單與借款', d:'儲蓄型保單持有期長，可比較各公司保戶網站／APP 是否 24 小時查詢保單價值與申請借款，例如保誠「保戶e點通」、南山「保戶園地」。'},
+    en:{t:'Online policy & loans', d:'Savings policies are held for years. Compare 24/7 online access to policy values and loans, e.g. PCA Life’s 保戶e點通 or Nan Shan’s policyholder portal.'}},
+  concierge:{keys:['div','life'], zh:{t:'專人一站式服務', d:'高額保單與傳承規劃牽涉核保與受益人安排，可比較是否提供專屬個案經理，例如「保誠人壽尊享」針對高資產客群提供一站式跟進。'},
+    en:{t:'Dedicated concierge', d:'Large policies and legacy plans involve underwriting and beneficiary design. Compare whether a dedicated case manager is offered, e.g. PCA Life’s 尊享 private-client service for high-net-worth clients.'}}
+};
+const COVER_KEYS = ['med','ci','acc','ltc'];
+
+function applyStatic(){
+  document.documentElement.lang = EN() ? 'en' : 'zh-Hant';
+  document.title = T('title');
+  document.querySelectorAll('[data-i]').forEach(el=>{ const v=T(el.dataset.i); if (typeof v==='string') el.innerHTML=v; });
+  document.querySelectorAll('[data-iph]').forEach(el=>{ el.placeholder=T(el.dataset.iph); });
+  $('micLabel').textContent = listening ? T('micOn') : T('mic');
+  document.querySelector(`input[name="lang"][value="${S.lang}"]`).checked = true;
+}
+function setLang(l){
+  const prevPreset = S.preset && STORIES[S.lang][S.preset] && $('story').value.trim() === STORIES[S.lang][S.preset].trim();
+  S.lang = l;
+  try{ localStorage.setItem('advisor-lang', l); }catch(e){}
+  try{ history.replaceState(null,'', l==='en' ? '#en' : location.pathname + location.search); }catch(e){}
+  applyStatic();
+  if (prevPreset){ $('story').value = STORIES[l][S.preset]; parseAndApply(true); }
+  else { if (S.lastParse) renderParsed(S.lastParse.o, S.lastParse.hit); render(); }
+}
+
+/* ================= parsers ================= */
 const DEFAULTS = {name:'客戶',age:35,sex:'M',marital:'single',job:1,kids:0,youngest:0,income:80,exp:4,debt:0,assets:0,budget:null,lifeHave:0,hasMed:false,hasCI:false,hasLTC:false,goals:['family','medical'],risk:'m',retire:65,svc:[],smart:'unknown'};
 const CN = {'零':0,'〇':0,'一':1,'二':2,'兩':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
 function cnToNum(s){ if (/^[0-9.]+$/.test(s)) return parseFloat(s); let t=0,c=0; for (const ch of s){ if (ch in CN) c=CN[ch]; else if (ch==='十'){t+=(c||1)*10;c=0;} else if (ch==='百'){t+=(c||1)*100;c=0;} else if (ch==='千'){t+=(c||1)*1000;c=0;} } return t+c; }
@@ -379,9 +546,11 @@ const N = '([0-9]+(?:\\.[0-9]+)?|[零〇一二兩两三四五六七八九十百�
 const FILL = '(?:大概|大約|約|約為|差不多|是|有|為|在|還有|剩|剩下|左右)*';
 function toWan(v,u){ if (u==='億') return v*10000; if (u==='千'||u==='千元') return v/10; if (u==='元'||u==='塊') return v/10000; if (!u && v>=10000) return v/10000; return v; }
 function grab(t, heads, sum){ const re = new RegExp(`(?:${heads})${FILL}${N}(萬|億|千元|千|元|塊)?`,'g'); let m, vs=[]; while((m=re.exec(t))) vs.push(toWan(cnToNum(m[1]),m[2])); return vs.length ? (sum ? vs.reduce((a,b)=>a+b,0) : vs[0]) : null; }
-function parseStory(raw){
+function newO(){ return JSON.parse(JSON.stringify(DEFAULTS)); }
+
+function parseZH(raw){
   const t = raw.replace(/[０-９]/g,d=>String.fromCharCode(d.charCodeAt(0)-65248)).replace(/\s+/g,'');
-  const o = JSON.parse(JSON.stringify(DEFAULTS)), hit = new Set(), set=(k,v)=>{o[k]=v;hit.add(k);};
+  const o = newO(), hit = new Set(), set=(k,v)=>{o[k]=v;hit.add(k);};
   const nm = t.match(/([一-龥]{1,2})(先生|小姐|太太|女士|董|總)/); if (nm && !/^(她|他|我|的|跟|和|與)/.test(nm[1])) set('name',nm[1]+nm[2]);
   if (/女性|女生|小姐|女士|太太|媽媽|她/.test(t)) set('sex','F'); else if (/男性|男生|先生|爸爸|他|董/.test(t)) set('sex','M');
   let childAges=[];
@@ -431,6 +600,81 @@ function parseStory(raw){
   if (s.length) set('svc',s);
   return {o,hit};
 }
+
+/* English parser */
+const EN_NUM = {a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6};
+const CUR = '(?:NT\\$|NTD|TWD|US\\$|\\$)?\\s*';
+const AMT = '([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*(million|mil|mn|m|k|thousand|萬)?\\b';
+function enWan(v,u){ v=parseFloat(String(v).replace(/,/g,'')); u=(u||'').toLowerCase(); if (/^(million|mil|mn|m)$/.test(u)) return v*100; if (/^(k|thousand)$/.test(u)) return v/10; if (u==='萬') return v; if (v>=10000) return v/10000; return v; }
+function grabEN(t, heads, opt={}){
+  const after = new RegExp(CUR+AMT+`\\s*(?:in\\s+|of\\s+|worth\\s+of\\s+)?(?:${heads})`,'gi');
+  const before = new RegExp(`(?:${heads})[^0-9.;]{0,25}?`+CUR+AMT,'gi');
+  const out=[]; let m;
+  for (const re of (opt.afterFirst===false?[before,after]:[after,before])){
+    while((m=re.exec(t))){ const tail=t.slice(m.index+m[0].length, m.index+m[0].length+18); out.push({v:enWan(m[1],m[2]), tail}); }
+    if (out.length) break;
+  }
+  if (!out.length) return null;
+  return opt.sum ? {v:out.reduce((s,x)=>s+x.v,0), tail:out[0].tail} : out[0];
+}
+function parseEN(raw){
+  const t = raw.replace(/\s+/g,' ');
+  const o = newO(), hit = new Set(), set=(k,v)=>{o[k]=v;hit.add(k);};
+  o.name = 'Client';
+  const nm = t.match(/\b(Mr|Mrs|Ms|Miss|Dr)\.?\s+([A-Z][a-z]+)/); if (nm) set('name', `${nm[1]}. ${nm[2]}`);
+  if (/\b(Mrs|Ms|Miss|she|her|woman|female|mother|mom)\b/i.test(t)) set('sex','F'); else if (/\b(Mr|he|his|man|male|father|dad)\b/i.test(t)) set('sex','M');
+  const childRe=/\b(kids?|child(?:ren)?|sons?|daughters?|bab(?:y|ies)|youngest)\b/i;
+  let childAges=[];
+  for (const cl of t.split(/[,.;\n]|\band\b/i).map(x=>x.trim()).filter(Boolean)){
+    const nums=[...cl.matchAll(/\b(\d{1,2})\b(?!\s*(?:k|m|million|thousand|%|,\d))/gi)].map(m=>+m[1]);
+    if (/retir/i.test(cl)){ const r=cl.match(/\b(\d{2})\b/); if (r && !/\$/.test(cl)) set('retire',clamp(+r[1],40,80)); continue; }
+    if (childRe.test(cl)){ if (!/\$/.test(cl)) { const ag=[...cl.matchAll(/\b(\d{1,2})\b(?!\s*(?:kids?|children|sons?|daughters?))/gi)].map(m=>+m[1]); childAges.push(...ag); } continue; }
+    if (!hit.has('age')){
+      const a = cl.match(/^(\d{2})$/) || cl.match(/\b(\d{2})\s*(?:years? old|yrs? old|yo|y\/o)\b/i) || cl.match(/\bage[d]?\s*(\d{2})\b/i);
+      if (a){ set('age',clamp(+a[1],18,80)); continue; }
+    }
+  }
+  const kc = t.match(/\b(\d|one|two|three|four|five|a|an)\s+(?:\w+\s+)?(kids?|children|child|sons?|daughters?)\b/i);
+  if (/\bno (kids|children)\b|\bchildless\b|\bDINK\b/i.test(t)) set('kids',0);
+  else if (kc) set('kids', clamp(isNaN(+kc[1]) ? EN_NUM[kc[1].toLowerCase()] : +kc[1], 0, 6));
+  else if (childAges.length) set('kids', childAges.length);
+  const yg = t.match(/youngest(?:\s+(?:one|child|kid))?\s*(?:is|aged|age|at)?\s*(\d{1,2})/i);
+  if (yg) set('youngest', +yg[1]); else if (childAges.length && hit.has('kids')) set('youngest', Math.min(...childAges));
+  if (/\b(kids|children) (?:are )?(?:all )?(grown|adults?|grown up)|adult children\b/i.test(t)){ set('youngest',25); if (!hit.has('kids')) set('kids',2); }
+  if (/divorc|widow|single (parent|mother|father)/i.test(t)) set('marital','divorced'); else if (/\bmarried|newlywed|\bwife\b|\bhusband\b|spouse|dual.income/i.test(t)) set('marital','married'); else if (/\bsingle\b|unmarried/i.test(t)) set('marital','single'); else if (o.kids>0) set('marital','married');
+  if (/construction|police|firefight|military|fisher|truck|professional driver/i.test(t)) set('job',3); else if (/\bfield\b|\bsales\b|outdoor|delivery|courier/i.test(t)) set('job',2); else if (/office|engineer|teacher|accountant|desk|civil servant|designer|doctor/i.test(t)) set('job',1);
+  let r;
+  if ((r=grabEN(t,'annual income|income|salary|earns?|makes?|earning',{afterFirst:false}))){ set('income', /month|\/mo\b/i.test(r.tail) ? Math.round(r.v*13*10)/10 : r.v); }
+  if ((r=grabEN(t,'spends?|spending|expenses|living costs|outgoings',{afterFirst:false}))){ set('exp', /year|annual/i.test(r.tail) ? Math.round(r.v/12*10)/10 : r.v); }
+  if ((r=grabEN(t,'mortgage|debt|loans?',{sum:true}))) set('debt', r.v);
+  if ((r=grabEN(t,'savings|saved|assets|cash|net worth|investments'))) set('assets', r.v);
+  if ((r=grabEN(t,'budget|can (?:put|pay|spend|afford)|premium budget',{afterFirst:false}))){ set('budget', /month|\/mo\b/i.test(r.tail) ? Math.round(r.v*12*10)/10 : Math.round(r.v*10)/10); }
+  if ((r=grabEN(t,'group life(?: cover)?|life cover|life insurance'))) set('lifeHave', r.v);
+  const own='(?:already (?:has|have)|has|have|owns?|holds?)\\s+(?:an?\\s+)?(?:[\\w-]+\\s+){0,3}?';
+  if (new RegExp(own+'(?:medical|health|hospital)','i').test(t)) set('hasMed',true);
+  if (new RegExp(own+'(?:critical illness|cancer)','i').test(t)) set('hasCI',true);
+  if (new RegExp(own+'(?:long-term care|LTC|disability)','i').test(t)) set('hasLTC',true);
+  if (/\bno (?:insurance|cover(?:age)?)\b|uninsured|nothing insured/i.test(t)){ set('hasMed',false); set('hasCI',false); set('hasLTC',false); set('lifeHave',0); }
+  const g=[];
+  if (/protect (?:the |his |her |their )?family|family protection|dependants|dependents|provide for/i.test(t)) g.push('family');
+  if (/medical|health|hospital|surgery|cancer|critical illness|long-term care/i.test(t)) g.push('medical');
+  if (/retire|pension|old age/i.test(t)) g.push('retire');
+  if (/education|tuition|college|university|school fees/i.test(t)) g.push('edu');
+  if (/legacy|estate|inherit|next generation|wealth transfer/i.test(t)) g.push('legacy');
+  if (/\bsav(?:e|ing) (?:money|regularly|up)|savings plan|build savings/i.test(t)) g.push('save');
+  if (g.length){ if (o.kids>0||o.marital==='married') g.push('family'); set('goals',[...new Set(g)]); }
+  if (/conservative|low risk|risk.averse|capital (?:protection|guaranteed)|can'?t lose/i.test(t)) set('risk','c'); else if (/aggressive|high risk|high return|tolerate (?:some )?volatility|growth-oriented|risk-tolerant/i.test(t)) set('risk','a'); else if (/balanced|moderate/i.test(t)) set('risk','m');
+  if (/(?:no|not|doesn'?t|does not|don'?t)\s+(?:\w+\s+){0,2}(?:need|want)\s+(?:\w+\s+){0,2}LINE/i.test(t)) set('smart','no');
+  else if (/\bLINE\b|check (?:the |their |his |her )?cover(?:age)? anytime|instant answers?|chatbot/i.test(t)) set('smart','yes');
+  const s=[];
+  if (/easy claims|claims? (?:to be )?(?:easy|simple|fast|quick|hassle)|hassle-free claim/i.test(t)) s.push('claims');
+  if (/online (?:policy|access|service)|policy loans?/i.test(t)) s.push('portal');
+  if (/concierge|dedicated|one-stop|private bank/i.test(t)) s.push('concierge');
+  if (s.length) set('svc',s);
+  return {o,hit};
+}
+function parseStory(raw){ return /[一-龥]/.test(raw.replace(/萬/g,'')) ? parseZH(raw) : parseEN(raw); }
+
 function writeForm(o){
   ['name','age','job','kids','youngest','income','exp','debt','assets','lifeHave','retire','marital'].forEach(f=>$(f).value=o[f]);
   ['hasMed','hasCI','hasLTC'].forEach(f=>$(f).checked=o[f]);
@@ -439,49 +683,53 @@ function writeForm(o){
   document.querySelector(`input[name="smart"][value="${o.smart}"]`).checked=true;
   document.querySelectorAll('input[name="goal"]').forEach(x=>x.checked=o.goals.includes(x.value));
   document.querySelectorAll('input[name="svc"]').forEach(x=>x.checked=o.svc.includes(x.value));
-  S.budget = o.budget; S.off.clear(); S.open.clear();
 }
 function renderParsed(o,hit){
-  const c=[], ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'};
-  if (hit.has('name')) c.push(o.name); if (hit.has('age')) c.push(`${o.age} 歲`); if (hit.has('marital')) c.push(ms[o.marital]);
-  if (hit.has('kids')) c.push(o.kids?`子女 ${o.kids} 位${hit.has('youngest')?`・最小 ${o.youngest} 歲`:''}`:'無子女');
-  if (hit.has('job')) c.push(['','內勤','外勤','高風險職業'][o.job]);
-  if (hit.has('income')) c.push(`年收入 ${wan(o.income)} 萬`); if (hit.has('exp')) c.push(`月支出 ${wan(o.exp)} 萬`);
-  if (hit.has('debt')) c.push(`負債 ${wan(o.debt)} 萬`); if (hit.has('assets')) c.push(`資產 ${wan(o.assets)} 萬`);
-  if (hit.has('budget')) c.push(`預算 ${wan(o.budget)} 萬/年`); if (hit.has('lifeHave')) c.push(o.lifeHave?`既有壽險 ${wan(o.lifeHave)} 萬`:'無既有保險');
-  if (o.hasMed) c.push('已有實支'); if (o.hasCI) c.push('已有重疾'); if (o.hasLTC) c.push('已有長照');
-  if (hit.has('retire')) c.push(`${o.retire} 歲退休`); if (hit.has('risk')) c.push({c:'保守',m:'穩健',a:'積極'}[o.risk]+'型');
-  if (hit.has('smart')) c.push(o.smart==='yes'?'想隨時查保障':'暫不需 LINE 查詢');
-  const miss=[]; if (!hit.has('age')) miss.push('年齡'); if (!hit.has('income')) miss.push('年收入'); if (!hit.has('exp')) miss.push('月支出');
-  if (!hit.has('debt')&&!hit.has('assets')) miss.push('負債／資產'); if (!hit.has('lifeHave')&&!o.hasMed) miss.push('既有保障');
-  $('parsed').innerHTML = c.map(x=>`<span class="pchip">${x}</span>`).join('') + (miss.length?`<div class="miss-lab">尚未提到，可補問：</div>`+miss.map(m=>`<span class="pchip miss">${m}</span>`).join(''):'');
+  const P=T('pchip'), c=[];
+  if (hit.has('name')) c.push(o.name); if (hit.has('age')) c.push(P.age(o.age)); if (hit.has('marital')) c.push(T('marital')[o.marital]);
+  if (hit.has('kids')) c.push(P.kids(o.kids, hit.has('youngest')?o.youngest:null));
+  if (hit.has('job')) c.push(P.jobs[o.job]);
+  if (hit.has('income')) c.push(P.income(M(o.income))); if (hit.has('exp')) c.push(P.exp(M(o.exp)));
+  if (hit.has('debt')) c.push(P.debt(M(o.debt))); if (hit.has('assets')) c.push(P.assets(M(o.assets)));
+  if (hit.has('budget')) c.push(P.budget(M(o.budget))); if (hit.has('lifeHave')) c.push(P.life(o.lifeHave?M(o.lifeHave):0));
+  if (o.hasMed) c.push(P.med); if (o.hasCI) c.push(P.ci); if (o.hasLTC) c.push(P.ltc);
+  if (hit.has('retire')) c.push(P.retire(o.retire)); if (hit.has('risk')) c.push(P.risk[o.risk]);
+  if (hit.has('smart')) c.push(o.smart==='yes'?P.smYes:P.smNo);
+  const ms=[]; if (!hit.has('age')) ms.push(P.miss.age); if (!hit.has('income')) ms.push(P.miss.income); if (!hit.has('exp')) ms.push(P.miss.exp);
+  if (!hit.has('debt')&&!hit.has('assets')) ms.push(P.miss.debt); if (!hit.has('lifeHave')&&!o.hasMed) ms.push(P.miss.have);
+  $('parsed').innerHTML = c.map(x=>`<span class="pchip">${x}</span>`).join('') + (ms.length?`<div class="miss-lab">${P.missLab}</div>`+ms.map(m=>`<span class="pchip miss">${m}</span>`).join(''):'');
 }
 let pt;
-function parseAndApply(){ const txt=$('story').value.trim(); if (!txt){ $('parsed').innerHTML=''; return; } const {o,hit}=parseStory(txt); writeForm(o); renderParsed(o,hit); render(); }
-$('story').addEventListener('input',()=>{ clearTimeout(pt); pt=setTimeout(parseAndApply,350); });
-$('clearStory').addEventListener('click',()=>{ $('story').value=''; $('parsed').innerHTML=''; writeForm(JSON.parse(JSON.stringify(DEFAULTS))); render(); $('story').focus(); });
+function parseAndApply(keepToggles){
+  const txt=$('story').value.trim(); if (!txt){ $('parsed').innerHTML=''; S.lastParse=null; return; }
+  const {o,hit}=parseStory(txt); writeForm(o); S.budget=o.budget;
+  if (!keepToggles){ S.off.clear(); S.open.clear(); }
+  S.lastParse={o,hit}; renderParsed(o,hit); render();
+}
+$('story').addEventListener('input',()=>{ S.preset=null; clearTimeout(pt); pt=setTimeout(()=>parseAndApply(false),350); });
+$('clearStory').addEventListener('click',()=>{ $('story').value=''; $('parsed').innerHTML=''; S.preset=null; S.lastParse=null; const o=newO(); if (EN()) o.name='Client'; writeForm(o); S.budget=null; S.off.clear(); render(); $('story').focus(); });
 
-/* ===== voice ===== */
+/* ================= voice ================= */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec=null, listening=false, base='';
-function micUI(){ $('mic').classList.toggle('on',listening); $('micLabel').textContent = listening?'聆聽中・點擊停止':'語音輸入'; }
-function fallbackMic(){ $('story').focus(); $('micHint').innerHTML='<b style="color:var(--ink)">此環境無法直接收音</b>：請點手機鍵盤上的麥克風聽寫，文字出現後自動辨識。'; toast('請改用鍵盤上的麥克風聽寫'); }
+function micUI(){ $('mic').classList.toggle('on',listening); $('micLabel').textContent = listening?T('micOn'):T('mic'); }
+function fallbackMic(){ $('story').focus(); $('micHint').innerHTML=T('micFallback'); toast(T('micToast')); }
 $('mic').addEventListener('click',()=>{
   if (!SR) return fallbackMic();
   if (listening){ try{rec.stop();}catch(e){} return; }
   try{
-    rec=new SR(); rec.lang='zh-TW'; rec.interimResults=true; rec.continuous=true;
-    base=$('story').value.trim(); if (base && !/[，。,]$/.test(base)) base+='，';
-    rec.onresult=e=>{ let s=''; for (let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; $('story').value=base+s; clearTimeout(pt); pt=setTimeout(parseAndApply,250); };
-    rec.onend=()=>{ listening=false; micUI(); parseAndApply(); };
-    rec.onerror=e=>{ listening=false; micUI(); if (/not-allowed/.test(e.error)) fallbackMic(); else if (!/no-speech|aborted/.test(e.error)) toast('語音辨識中斷，請再試一次'); };
+    rec=new SR(); rec.lang = EN() ? 'en-US' : 'zh-TW'; rec.interimResults=true; rec.continuous=true;
+    base=$('story').value.trim(); if (base && !/[，。,.]$/.test(base)) base += EN() ? '. ' : '，';
+    rec.onresult=e=>{ let s=''; for (let i=0;i<e.results.length;i++) s+=e.results[i][0].transcript; $('story').value=base+s; S.preset=null; clearTimeout(pt); pt=setTimeout(()=>parseAndApply(false),250); };
+    rec.onend=()=>{ listening=false; micUI(); parseAndApply(false); };
+    rec.onerror=e=>{ listening=false; micUI(); if (/not-allowed/.test(e.error)) fallbackMic(); else if (!/no-speech|aborted/.test(e.error)) toast(T('micErr')); };
     rec.start(); listening=true; micUI();
   }catch(e){ listening=false; micUI(); fallbackMic(); }
 });
 
-/* ===== planning ===== */
+/* ================= planning ================= */
 function read(){
-  return { name:$('name').value.trim()||'客戶', age:clamp(num('age',35),18,75), sex:radio('sex')||'M', marital:$('marital').value, job:+$('job').value,
+  return { name:$('name').value.trim()||(EN()?'Client':'客戶'), age:clamp(num('age',35),18,75), sex:radio('sex')||'M', marital:$('marital').value, job:+$('job').value,
     kids:clamp(num('kids'),0,6), youngest:clamp(num('youngest'),0,40), income:Math.max(0,num('income')), exp:Math.max(0,num('exp')),
     debt:Math.max(0,num('debt')), assets:Math.max(0,num('assets')), lifeHave:Math.max(0,num('lifeHave')), retire:clamp(num('retire',65),40,80),
     hasMed:$('hasMed').checked, hasCI:$('hasCI').checked, hasLTC:$('hasLTC').checked,
@@ -502,11 +750,11 @@ function plan(c){
   const pct=Math.min(0.10+saveGoals*0.03+(c.assets>c.income*10?0.05:0),0.25), suggested=Math.round(c.income*pct*2)/2;
   const budget = c.budget!=null ? c.budget : suggested;
   const items=[];
-  if (lifeGap>0) items.push({key:'life',pr:hasDependents?1:3,cover:lifeGap,unit:'萬',label:'保額',available:a<=64});
-  if (!c.hasMed) items.push({key:'med',pr:has('medical')?1:2,cover:30,unit:'萬',label:'雜費限額'});
-  if (!c.hasCI) items.push({key:'ci',pr:1,cover:ciNeed,unit:'萬',label:'一次金'});
-  items.push({key:'acc',pr:c.job>=2?1:2,cover:accNeed,unit:'萬',label:'保額'});
-  if (!c.hasLTC) items.push({key:'ltc',pr:a>=45?1:2,cover:3,unit:'萬/月',label:'月給付'});
+  if (lifeGap>0) items.push({key:'life',pr:hasDependents?1:3,cover:lifeGap,available:a<=64});
+  if (!c.hasMed) items.push({key:'med',pr:has('medical')?1:2,cover:30});
+  if (!c.hasCI) items.push({key:'ci',pr:1,cover:ciNeed});
+  items.push({key:'acc',pr:c.job>=2?1:2,cover:accNeed});
+  if (!c.hasLTC) items.push({key:'ltc',pr:a>=45?1:2,cover:3,monthly:true});
   items.forEach(i=>{ i.premium = i.available===false?0:prem[i.key](i.cover); i.status='in'; });
   const order=['med','ci','life','acc','ltc'];
   items.sort((x,y)=>x.pr-y.pr||order.indexOf(x.key)-order.indexOf(y.key));
@@ -527,10 +775,9 @@ function plan(c){
   ['ann','div','inv'].forEach(k=>{ if (S.off.has(k)) w[k]=0; });
   const tw=w.ann+w.div+w.inv;
   let sav = tw>0 ? {ann:Sv*w.ann/tw, div:Sv*w.div/tw, inv:Sv*w.inv/tw} : {ann:0,div:0,inv:0};
-  if (tw===0){ reserve+=Sv; }
+  if (tw===0) reserve+=Sv;
   for (const k of ['inv','div','ann']) if (sav[k]>0 && sav[k]<3 && Sv>=3){ const tg=Object.keys(sav).filter(x=>x!==k&&w[x]>0).sort((p,q)=>sav[q]-sav[p])[0]; if (tg){ sav[tg]+=sav[k]; sav[k]=0; } }
   if (Sv<3 && tw>0){ reserve+=Sv; sav={ann:0,div:0,inv:0}; }
-  // savings rows (show even when toggled off, so they can be toggled back)
   const savKeys = ['ann','div','inv'].filter(k=> sav[k]>0 || S.off.has(k));
   const payY = yrsToRet>0?clamp(yrsToRet,6,20):6, H = yrsToRet>0?Math.max(yrsToRet,payY):15;
   const sc={low:{ann:c.rateA-.5,div:c.rateD-1,inv:1},mid:{ann:c.rateA,div:c.rateD,inv:4.5},high:{ann:c.rateA+.25,div:c.rateD+1,inv:7}};
@@ -544,119 +791,104 @@ function plan(c){
   const total=alloc.filter(x=>x.key!=='reserve').reduce((s,x)=>s+x.amt,0);
   return {c,lifeNeed,lifeGap,support,edu,ciNeed,accNeed,items,sav,savKeys,reserve,budget,suggested,pct,total,shortfall,proj,payY,H,retNeed,atRet,yrsToRet,alloc,hasDependents,readiness:retNeed>0?atRet.mid/retNeed:null};
 }
+const coverTxt = i => i.monthly ? `${M(i.cover)}${T('perMo')}` : M(i.cover);
 
-/* ===== insurer & service data (public info) ===== */
-const COLS = ['保障內容','保單繳費','借款試算','理賠'];
-const INSURERS = [
-  {name:'保誠人壽', bot:'智能客服「保寶」', ch:'LINE 官方帳號・官網・FB', cap:[1,1,0,1], note:'可詢問保單內容、網路投保、保費查詢及理賠；以多年客服常見問題設計約 500 個情境問題。', src:'保誠人壽新聞稿（2019）；2026 年春節服務公告仍列為 LINE 服務管道'},
-  {name:'南山人壽', bot:'智能客服「透透 Talk Talk」', ch:'官方 LINE・官網・保戶園地・APP', cap:[0,1,1,0], note:'保單狀態、繳費、近期應領，借還款與解約金試算，保單變更與處理進度；NLU 結合 LLM，複雜問題轉真人文字客服。', src:'南山人壽保戶通知；iThome（2025）'},
-  {name:'國泰人壽', bot:'智能客服「阿發」', ch:'LINE 官方帳號・官網・APP', cap:[0,1,1,0], note:'查詢保單現況、繳費紀錄，申請保單貸款，查詢所屬業務員。', src:'ETtoday、iThome（2018）'},
-  {name:'富邦人壽', bot:'「富邦FUBON」LINE 個人化服務', ch:'富邦金控共用 LINE 官方帳號', cap:[0,0,1,1], note:'綁定後可收理賠、保險給付與保單借還款等案件受理進度通知；另有電話智能語音客服查詢保單。', src:'富邦金控（2025）；富邦人壽官網'},
-  {name:'新光人壽', bot:'LINE 官方帳號個人化服務', ch:'LINE 官方帳號・APP', cap:[0,1,1,0], note:'保單／借款查詢、個人權益通知推播；業界較早推出 LINE 個人化保險服務。', src:'數位時代、今周刊（2019–2021）'}
-];
-const SVC = {
-  claims:{t:'理賠申請便利', d:'實支實付與意外險屬高頻理賠險種。可比較是否支援「理賠聯盟鏈」線上申請（多家公司參與，資料可同步轉送）及其他送件管道，例如保誠人壽可透過 7-ELEVEN ibon 24 小時申請。', keys:['med','acc','ci']},
-  portal:{t:'線上查保單與借款', d:'儲蓄型保單持有期長，可比較各公司保戶網站／APP 是否 24 小時查詢保單價值與申請借款，例如保誠「保戶e點通」、南山「保戶園地」。', keys:['ann','div','inv']},
-  concierge:{t:'專人一站式服務', d:'高額保單與傳承規劃牽涉核保與受益人安排，可比較是否提供專屬個案經理，例如「保誠人壽尊享」針對高資產客群提供一站式跟進。', keys:['div','life']}
-};
-const COVER_KEYS = ['med','ci','acc','ltc'];
-
-/* ===== render ===== */
+/* ================= render ================= */
 function render(){
   const c=read(), p=plan(c);
   renderQuick(p); renderHero(p); renderPlan(p); renderGaps(p); renderProj(p); renderSvc(p); renderSummary(p);
   $('svcBadge').style.display = c.smart==='unknown' ? '' : 'none';
-  $('barSum').innerHTML = `<b>年繳約 ${wan(p.total)} 萬</b>月均 ${fmt(p.total*10000/12)} 元・占收入 ${fmt(c.income?p.total/c.income*100:0,1)}%`;
+  $('barSum').innerHTML = T('bar')(p.total, fmt(c.income?p.total/c.income*100:0,1));
 }
 function renderQuick(p){
   const r=$('budgetR'), max=Math.max(10, Math.ceil(p.c.income*0.35/5)*5);
   r.max=max; r.value=Math.min(p.budget,max);
-  $('budgetVal').innerHTML = `${wan(p.budget)}<small>萬／年</small>`;
-  $('budgetNote').textContent = p.c.budget==null ? `建議值：年收入 ${Math.round(p.pct*100)}%` : `建議值 ${wan(p.suggested)} 萬`;
+  $('budgetVal').innerHTML = `${M(p.budget)}<small>${T('perYr')}</small>`;
+  $('budgetNote').textContent = p.c.budget==null ? T('budgetAuto')(Math.round(p.pct*100)) : T('budgetSug')(M(p.suggested));
   $('budgetAuto').style.visibility = p.c.budget==null ? 'hidden' : 'visible';
 }
 function renderHero(p){
-  const c=p.c, ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'}[c.marital];
-  $('who').textContent = `${c.name}・${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${fmt(c.income)} 萬`;
-  $('bigTotal').textContent = wan(p.total); $('bigSub').textContent = `萬元／年・月均 ${fmt(p.total*10000/12)} 元`;
+  const c=p.c, ms=T('marital')[c.marital];
+  $('who').textContent = T('who')(c,ms);
+  $('bigTotal').textContent = EN() ? M(p.total) : wan(p.total); $('bigSub').textContent = T('bigSub')(p.total);
   const sum = p.alloc.reduce((s,x)=>s+x.amt,0)||1;
-  $('stack').innerHTML = p.alloc.map((x,i)=>`<i data-i="${i}" style="width:${x.amt/sum*100}%;background:${HEX[x.key]}" title="${NAMES[x.key]}"></i>`).join('');
+  $('stack').innerHTML = p.alloc.map((x,i)=>`<i data-i="${i}" style="width:${x.amt/sum*100}%;background:${HEX[x.key]}" title="${NAME(x.key)}"></i>`).join('');
   const prot = p.alloc.filter(x=>['life','med','ci','acc','ltc'].includes(x.key)).reduce((s,x)=>s+x.amt,0);
-  const cap0 = `保障 <b>${fmt(prot/sum*100)}%</b>・儲蓄 <b>${fmt((sum-prot-p.reserve)/sum*100)}%</b>${p.reserve>0.05?`・保留 <b>${fmt(p.reserve/sum*100)}%</b>`:''}　<span style="color:var(--muted)">點色塊看明細</span>`;
-  $('stackCap').innerHTML = cap0;
+  const cap0 = T('capBase')(fmt(prot/sum*100), fmt((sum-prot-p.reserve)/sum*100), p.reserve>0.05?fmt(p.reserve/sum*100):null);
+  $('stack').classList.remove('dim'); $('stackCap').innerHTML = cap0;
   $('stack').querySelectorAll('i').forEach(el=>el.addEventListener('click',e=>{
     e.stopPropagation(); const x=p.alloc[+el.dataset.i], on=el.classList.contains('on');
     $('stack').querySelectorAll('i').forEach(j=>j.classList.remove('on'));
     if (on){ $('stack').classList.remove('dim'); $('stackCap').innerHTML=cap0; return; }
     el.classList.add('on'); $('stack').classList.add('dim');
-    $('stackCap').innerHTML = `<i class="sw" style="background:${HEX[x.key]};vertical-align:-1px"></i> <b>${NAMES[x.key]}</b>　年繳 ${wan(x.amt)} 萬・${fmt(x.amt/sum*100,1)}%`;
+    $('stackCap').innerHTML = `<i class="sw" style="background:${HEX[x.key]};vertical-align:-1px"></i> ` + T('capItem')(NAME(x.key), M(x.amt), fmt(x.amt/sum*100,1));
   }));
   const ratio=c.income>0?p.total/c.income:0, rc = ratio<=.15?'var(--good)':ratio<=.25?'var(--warning)':'var(--critical)';
   const tot=p.items.filter(i=>!['na','off'].includes(i.status)).length, cov=p.items.filter(i=>i.status==='in').length;
-  $('mini').innerHTML = `<div>占年收入<b><span class="dot" style="background:${rc}"></span>${fmt(ratio*100,1)}%</b></div>
-    <div>缺口補足<b>${cov}／${tot} 項</b></div>
-    <div>退休準備率<b>${p.readiness==null?'—':fmt(Math.min(p.readiness,9.99)*100)+'%'}</b></div>`;
+  $('mini').innerHTML = `<div>${T('mIncome')}<b><span class="dot" style="background:${rc}"></span>${fmt(ratio*100,1)}%</b></div>
+    <div>${T('mGap')}<b>${T('mGapV')(cov,tot)}</b></div>
+    <div>${T('mRet')}<b>${p.readiness==null?'—':fmt(Math.min(p.readiness,9.99)*100)+'%'}</b></div>`;
 }
 function reason(p,i){
-  const c=p.c;
+  const c=p.c, R=T('rs');
   switch(i.key){
-    case 'life': { if (!p.hasDependents) return `目前無扶養責任，保留負債與身後費用即可，列為視預算項目。`;
-      const parts=[]; if (c.debt) parts.push(`負債 ${wan(c.debt)} 萬`); parts.push(`${p.support} 年家庭生活費`); if (p.edu>0) parts.push(`子女教育 ${wan(p.edu)} 萬`);
-      return `家庭責任需求 ${wan(p.lifeNeed)} 萬（${parts.join('、')}），扣除既有 ${wan(c.lifeHave)} 萬後缺口 ${wan(p.lifeGap)} 萬；以定期壽險補足，保費效率最高。` + (i.status==='partial'?`受預算限制先配置 ${wan(i.cover)} 萬。`:''); }
-    case 'med': return '承接健保以外的自費醫材、病房差額與手術費用，建議雜費限額 30 萬元，搭配住院日額 3,000 元。';
-    case 'ci': return `確診重大傷病或癌症時給付一次金，約 ${fmt(i.cover/Math.max(c.income,1),1)} 年收入，支應治療期間收入中斷與自費療程。`;
-    case 'acc': return `${['','內勤職業','外勤職業','高風險職業'][c.job]}，規劃意外身故／失能保障並附加意外實支實付${c.job>=2?'；外勤職類列為必要保障':''}。`;
-    case 'ltc': return `${c.age>=45?'已進入失能風險上升期，':'年輕投保可鎖定較低費率，'}失能時每月給付 3 萬元。`;
-    case 'ann': return `累積${c.goals.includes('retire')?'退休金':'中長期資金'}，${p.payY} 年繳費，假設宣告利率 ${fmt(c.rateA,2)}%（非保證），退休後可轉年金給付。`;
-    case 'div': return `兼具保證給付與分紅潛力，${c.goals.includes('legacy')?'可指定受益人做為資產傳承工具':'適合中長期穩健儲蓄'}；分紅非保證。`;
-    case 'inv': return '依積極屬性少量配置，參與市場成長；須另行揭露投資風險並完成適合度評估。';
+    case 'life': { if (!p.hasDependents) return R.lifeNoDep; const LP=R.lifeParts, parts=[];
+      if (c.debt) parts.push(LP.debt(M(c.debt))); parts.push(LP.sup(p.support)); if (p.edu>0) parts.push(LP.edu(M(p.edu)));
+      return R.life(M(p.lifeNeed), parts.join(LP.sep), M(c.lifeHave), M(p.lifeGap)) + (i.status==='partial'?R.lifePartial(M(i.cover)):''); }
+    case 'med': return R.med;
+    case 'ci': return R.ci(fmt(i.cover/Math.max(c.income,1),1));
+    case 'acc': return R.acc(c.job, c.job>=2);
+    case 'ltc': return R.ltc(c.age>=45);
+    case 'ann': return R.ann(c.goals.includes('retire'), p.payY, fmt(c.rateA,2));
+    case 'div': return R.div(c.goals.includes('legacy'));
+    case 'inv': return R.inv;
   }
 }
 function svcLine(p,key){
   const c=p.c;
-  if (c.smart==='yes' && COVER_KEYS.includes(key)) return `<div class="svc-line">${SHIELD}<div><b>服務搭配</b>這類保單條款細，客戶出險時最常問「有沒有賠」。選承保公司時，可優先比較能用 LINE 即時說明保障內容者（見「服務」頁）。</div></div>`;
+  if (c.smart==='yes' && COVER_KEYS.includes(key)) return `<div class="svc-line">${SHIELD}<div>${T('svcSmart')}</div></div>`;
   const hit = c.svc.find(s=>SVC[s].keys.includes(key));
-  if (hit) return `<div class="svc-line">${SHIELD}<div><b>服務搭配</b>客戶在意「${SVC[hit].t}」，選承保公司時一併比較（見「服務」頁）。</div></div>`;
+  if (hit) return `<div class="svc-line">${SHIELD}<div>${T('svcOther')(SVC[hit][S.lang].t)}</div></div>`;
   return '';
 }
-function prodRow(p, key, figs, tag, status){
-  const off = S.off.has(key), open = S.open.has(key), locked = status==='na';
+function prodRow(key, figs, tag, status, prem, why, p){
+  const off=S.off.has(key), open=S.open.has(key), locked=status==='na';
   return `<div class="prow${off?' off':''}${open?' open':''}" data-k="${key}">
-    <div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX[key]}"></i>${NAMES[key]} ${tag}</div><div class="sub">${figs}</div></div>
-      <div class="amt">${off?'已移除':status==='deferred'?'下階段':'年繳'}<b>${off||status==='deferred'||locked?'—':wan(p._prem[key])+' 萬'}</b></div>
-      ${locked?'':`<label class="tgl" onclick="event.stopPropagation()"><input type="checkbox" data-tgl="${key}" ${off?'':'checked'} aria-label="納入${NAMES[key]}"><span></span></label>`}
+    <div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX[key]}"></i>${NAME(key)} ${tag}</div><div class="sub">${figs}</div></div>
+      <div class="amt">${off?T('amtOff'):status==='deferred'?T('amtLater'):T('amtPrem')}<b>${off||status==='deferred'||locked?'—':M(prem)}</b></div>
+      ${locked?'':`<label class="tgl" onclick="event.stopPropagation()"><input type="checkbox" data-tgl="${key}" ${off?'':'checked'} aria-label="${NAME(key)}"><span></span></label>`}
       ${CHEV}</div>
-    <div class="pbody"><p>${p._reason[key]}</p>${off?'':svcLine(p,key)}</div></div>`;
+    <div class="pbody"><p>${why}</p>${off?'':svcLine(p,key)}</div></div>`;
 }
 function renderPlan(p){
-  const prL={1:'P1',2:'P2',3:'P3'}; p._prem={}; p._reason={};
   let html='';
   p.items.forEach(i=>{
-    p._prem[i.key]=i.premium; p._reason[i.key]= i.status==='na' ? '65 歲以上定期壽險承保受限，改以分紅／終身型保單處理。' : reason(p,i);
-    const tag = i.status==='na' ? '<span class="tag def">不適用</span>' : i.status==='deferred' ? '<span class="tag def">預算外</span>' : `<span class="tag p${i.pr}">${prL[i.pr]}</span>`;
-    html += prodRow(p, i.key, `${i.label} ${wan(i.cover)} ${i.unit}${i.status==='partial'?'（先部分配置）':''}`, tag, i.status);
+    const why = i.status==='na' ? T('rs').na : reason(p,i);
+    const tag = i.status==='na' ? `<span class="tag def">${T('tagNA')}</span>` : i.status==='deferred' ? `<span class="tag def">${T('tagOver')}</span>` : `<span class="tag p${i.pr}">P${i.pr}</span>`;
+    html += prodRow(i.key, `${T('lab')[i.key]} ${coverTxt(i)}${i.status==='partial'?T('partial'):''}`, tag, i.status, i.premium, why, p);
   });
-  p.savKeys.forEach(k=>{ p._prem[k]=p.sav[k]; p._reason[k]=reason(p,{key:k}); html += prodRow(p,k,`儲蓄配置・繳 ${p.payY} 年`,'<span class="tag p2">儲蓄</span>','in'); });
-  if (p.reserve>0.05) html += `<div class="prow off"><div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX.reserve}"></i>保留彈性預算</div><div class="sub">尚未提到儲蓄目標，先保留</div></div><div class="amt">年度<b>${wan(p.reserve)} 萬</b></div></div></div>`;
+  p.savKeys.forEach(k=>{ html += prodRow(k, T('savSub')(p.payY), `<span class="tag p2">${T('tagSave')}</span>`, 'in', p.sav[k], reason(p,{key:k}), p); });
+  if (p.reserve>0.05) html += `<div class="prow off"><div class="ph"><div class="main"><div class="nm"><i class="sw" style="background:${HEX.reserve}"></i>${NAME('reserve')}</div><div class="sub">${T('reserveSub')}</div></div><div class="amt">${T('amtYear')}<b>${M(p.reserve)}</b></div></div></div>`;
   $('prods').innerHTML = html;
   let note='';
-  if (p.shortfall) note += `<div class="warn">預算 ${wan(p.budget)} 萬不足以一次補足全部缺口，已依優先順序配置；可拉高上方預算，或於加薪、房貸遞減時補上「預算外」項目。</div>`;
-  if (p.c.smart==='unknown') note += `<div class="note-row" data-go="svc"><span>還沒確認客戶是否需要<b>隨時查保障範圍</b></span><span>去詢問 →</span></div>`;
+  if (p.shortfall) note += `<div class="warn">${T('shortfall')(M(p.budget))}</div>`;
+  if (p.c.smart==='unknown') note += `<div class="note-row" data-go="svc"><span>${T('askNote')}</span><span style="white-space:nowrap">${T('askGo')}</span></div>`;
   $('planNote').innerHTML = note;
   $('prods').querySelectorAll('.prow[data-k] .ph').forEach(h=>h.addEventListener('click',()=>{ const k=h.parentElement.dataset.k; S.open.has(k)?S.open.delete(k):S.open.add(k); h.parentElement.classList.toggle('open'); }));
-  $('prods').querySelectorAll('[data-tgl]').forEach(t=>t.addEventListener('change',()=>{ const k=t.dataset.tgl; t.checked?S.off.delete(k):S.off.add(k); render(); toast(t.checked?`已納入${NAMES[k]}`:`已移除${NAMES[k]}，預算轉入其他項目`); }));
+  $('prods').querySelectorAll('[data-tgl]').forEach(t=>t.addEventListener('change',()=>{ const k=t.dataset.tgl; t.checked?S.off.delete(k):S.off.add(k); render(); toast(t.checked?T('tOn')(NAME(k)):T('tOff')(NAME(k))); }));
   $('planNote').querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.go)));
 }
 function renderGaps(p){
-  const c=p.c, rec=k=>p.items.find(i=>i.key===k), ok=i=>i&&(i.status==='in'||i.status==='partial'), L=rec('life');
+  const c=p.c, rec=k=>p.items.find(i=>i.key===k), ok=i=>i&&(i.status==='in'||i.status==='partial'), L=rec('life'), G=T('gaps'), GS=T('gapSub');
   const rows=[
-    {l:'壽險',s:`${p.support} 年家庭責任`,need:p.lifeNeed,have:Math.min(c.lifeHave,p.lifeNeed),add:ok(L)?L.cover:0,u:'萬'},
-    {l:'醫療實支',s:'雜費限額',need:30,have:c.hasMed?30:0,add:ok(rec('med'))?30:0,u:'萬'},
-    {l:'重大傷病',s:'約 2 年收入',need:p.ciNeed,have:c.hasCI?p.ciNeed:0,add:ok(rec('ci'))?p.ciNeed:0,u:'萬'},
-    {l:'意外傷害',s:'約 5 年收入',need:p.accNeed,have:0,add:ok(rec('acc'))?p.accNeed:0,u:'萬'},
-    {l:'長照失能',s:'每月給付',need:3,have:c.hasLTC?3:0,add:ok(rec('ltc'))?3:0,u:'萬/月'}];
+    {k:'life',s:GS.life(p.support),need:p.lifeNeed,have:Math.min(c.lifeHave,p.lifeNeed),add:ok(L)?L.cover:0},
+    {k:'med',s:GS.med,need:30,have:c.hasMed?30:0,add:ok(rec('med'))?30:0},
+    {k:'ci',s:GS.ci,need:p.ciNeed,have:c.hasCI?p.ciNeed:0,add:ok(rec('ci'))?p.ciNeed:0},
+    {k:'acc',s:GS.acc,need:p.accNeed,have:0,add:ok(rec('acc'))?p.accNeed:0},
+    {k:'ltc',s:GS.ltc,need:3,have:c.hasLTC?3:0,add:ok(rec('ltc'))?3:0,mo:true}];
+  const mm=(v,mo)=>mo?`${M(v)}${T('perMo')}`:M(v);
   $('gaps').innerHTML = rows.map(r=>{ const hp=r.need?Math.min(100,r.have/r.need*100):100, ap=r.need?Math.min(100-hp,r.add/r.need*100):0, rem=Math.max(0,r.need-r.have-r.add);
-    return `<div class="gap-row"><div class="t"><div><b>${r.l}</b> <span>${r.s}・需求 ${wan(r.need)} ${r.u}</span></div><span class="num">${r.need===0?'無需求':rem<=.001?'已補足':`尚缺 ${wan(rem)}`}</span></div>
+    return `<div class="gap-row"><div class="t"><div><b>${G[r.k]}</b> <span>${r.s} · ${T('need')} ${mm(r.need,r.mo)}</span></div><span class="num" style="white-space:nowrap">${r.need===0?T('noNeed'):rem<=.001?T('covered'):T('short')(mm(rem,r.mo))}</span></div>
       <div class="track">${hp>0?`<i style="width:${hp}%;background:#9c9a93"></i>`:''}${ap>0?`<i style="width:${ap}%;background:#2a78d6"></i>`:''}</div></div>`; }).join('');
 }
 function niceMax(v){ if (v<=0) return 10; const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e; }
@@ -664,100 +896,117 @@ function renderProj(p){
   const st=p.sav.ann+p.sav.div+p.sav.inv;
   $('projCard').style.display = st>0?'':'none'; $('projEmpty').style.display = st>0?'none':'';
   if (st<=0) return;
-  const sk=radio('scen')||'mid', scName={low:'保守',mid:'中性',high:'樂觀'}[sk];
-  const W=360,H=220,m={l:44,r:10,t:16,b:28}, d=p.proj, maxV=Math.max(...d.map(x=>x.high));
+  const sk=radio('scen')||'mid', scName=T({low:'scLow',mid:'scMid',high:'scHigh'}[sk]);
+  const W=360,H=220,m={l:EN()?46:44,r:10,t:16,b:28}, d=p.proj, maxV=Math.max(...d.map(x=>x.high));
   const showNeed=p.retNeed>0&&p.retNeed<=maxV*1.6, ymax=niceMax(Math.max(maxV,showNeed?p.retNeed:0)*1.05);
   const X=t=>m.l+t/p.H*(W-m.l-m.r), Y=v=>H-m.b-v/ymax*(H-m.t-m.b);
-  $('projLegend').innerHTML = `<span><i class="ln" style="background:#141414"></i>${scName}情境保單價值</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,#9c9a93 0 4px,transparent 4px 7px)"></i>累積已繳</span>${showNeed?`<span><i class="ln" style="background:repeating-linear-gradient(90deg,#9b1c25 0 2px,transparent 2px 5px)"></i>退休需求</span>`:''}`;
+  $('projLegend').innerHTML = `<span><i class="ln" style="background:#141414"></i>${T('lgValue')(scName)}</span><span><i class="ln" style="background:repeating-linear-gradient(90deg,#9c9a93 0 4px,transparent 4px 7px)"></i>${T('lgPaid')}</span>${showNeed?`<span><i class="ln" style="background:repeating-linear-gradient(90deg,#9b1c25 0 2px,transparent 2px 5px)"></i>${T('lgNeed')}</span>`:''}`;
+  const tick = v => EN() ? M(v).replace('NT$','') : fmt(v);
   let g='';
-  for (let i=0;i<=4;i++){ const v=ymax*i/4,y=Y(v); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#e3e1db"/><text x="${m.l-6}" y="${y+3.5}" text-anchor="end" font-size="10" fill="#8a8984">${fmt(v)}</text>`; }
+  for (let i=0;i<=4;i++){ const v=ymax*i/4,y=Y(v); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#e3e1db"/><text x="${m.l-6}" y="${y+3.5}" text-anchor="end" font-size="10" fill="#8a8984">${i===0?'0':tick(v)}</text>`; }
   const step=p.H>20?5:p.H>10?3:p.H>6?2:1;
-  for (let t=0;t<=p.H;t+=step) g+=`<text x="${X(t)}" y="${H-m.b+16}" text-anchor="middle" font-size="10" fill="#8a8984">${p.c.age+t}歲</text>`;
-  g+=`<text x="${m.l-6}" y="${m.t-5}" text-anchor="end" font-size="9.5" fill="#8a8984">萬元</text>`;
-  // band low-high
+  for (let t=0;t<=p.H;t+=step) g+=`<text x="${X(t)}" y="${H-m.b+16}" text-anchor="middle" font-size="10" fill="#8a8984">${T('ageTick')(p.c.age+t)}</text>`;
+  g+=`<text x="${m.l-6}" y="${m.t-5}" text-anchor="end" font-size="9.5" fill="#8a8984">${T('axisUnit')}</text>`;
   const band = d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r.high).toFixed(1)}`).join('') + d.slice().reverse().map(r=>`L${X(r.t).toFixed(1)},${Y(r.low).toFixed(1)}`).join('') + 'Z';
   g+=`<path d="${band}" fill="#2a78d6" opacity=".10"/>`;
-  if (showNeed){ const y=Y(p.retNeed); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#9b1c25" stroke-width="1.5" stroke-dasharray="2 3"/><text x="${m.l+4}" y="${y-5}" font-size="10" fill="#9b1c25">退休需求 ${wan(p.retNeed)} 萬</text>`; }
+  if (showNeed){ const y=Y(p.retNeed); g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#9b1c25" stroke-width="1.5" stroke-dasharray="2 3"/><text x="${m.l+4}" y="${y-5}" font-size="10" fill="#9b1c25">${T('needLine')(M(p.retNeed))}</text>`; }
   g+=`<path d="${d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r.paid).toFixed(1)}`).join('')}" fill="none" stroke="#9c9a93" stroke-width="2" stroke-dasharray="4 3"/>`;
   g+=`<path d="${d.map((r,i)=>`${i?'L':'M'}${X(r.t).toFixed(1)},${Y(r[sk]).toFixed(1)}`).join('')}" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  const last=d[d.length-1]; g+=`<text x="${X(p.H)-2}" y="${Y(last[sk])-8}" text-anchor="end" font-size="11" font-weight="600" fill="#141414">${wan(last[sk])} 萬</text>`;
+  const last=d[d.length-1]; g+=`<text x="${X(p.H)-2}" y="${Y(last[sk])-8}" text-anchor="end" font-size="11" font-weight="600" fill="#141414">${M(last[sk])}</text>`;
   g+=`<line id="xh" y1="${m.t}" y2="${H-m.b}" stroke="#141414" opacity="0"/><circle id="xd" r="4" fill="#141414" stroke="#fcfcfb" stroke-width="2" opacity="0"/><rect id="hit" x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent"/>`;
-  $('projBox').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="儲蓄累積試算">${g}</svg><div class="tip" id="ptip"></div>`;
+  $('projBox').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}</svg><div class="tip" id="ptip"></div>`;
   const svg=$('projBox').querySelector('svg'), tip=$('ptip');
   const mv=e=>{ const rb=svg.getBoundingClientRect(), t=clamp(Math.round(((e.clientX-rb.left)/rb.width*W-m.l)/(W-m.l-m.r)*p.H),0,p.H), r=d[t];
     $('xh').setAttribute('x1',X(t)); $('xh').setAttribute('x2',X(t)); $('xh').setAttribute('opacity',.3);
     $('xd').setAttribute('cx',X(t)); $('xd').setAttribute('cy',Y(r[sk])); $('xd').setAttribute('opacity',1);
-    tip.innerHTML=`<b>${r.age} 歲</b><div class="r"><span>${scName}</span><span>${wan(r[sk])} 萬</span></div><div class="r"><span>區間</span><span>${wan(r.low)}～${wan(r.high)}</span></div><div class="r"><span>已繳</span><span>${wan(r.paid)} 萬</span></div>`;
-    tip.style.left=clamp(X(t)/W*rb.width,64,rb.width-64)+'px'; tip.style.top=(Y(r.high)/H*rb.height-8)+'px'; tip.style.opacity=1; };
+    tip.innerHTML=`<b>${T('tipAge')(r.age)}</b><div class="r"><span>${scName}</span><span>${M(r[sk])}</span></div><div class="r"><span>${T('tipRange')}</span><span>${M(r.low)} – ${M(r.high)}</span></div><div class="r"><span>${T('tipPaid')}</span><span>${M(r.paid)}</span></div>`;
+    tip.style.left=clamp(X(t)/W*rb.width,70,rb.width-70)+'px'; tip.style.top=(Y(r.high)/H*rb.height-8)+'px'; tip.style.opacity=1; };
   $('hit').addEventListener('pointermove',mv); $('hit').addEventListener('pointerdown',mv);
   $('hit').addEventListener('pointerleave',()=>{ tip.style.opacity=0; $('xh').setAttribute('opacity',0); $('xd').setAttribute('opacity',0); });
   const ar=p.atRet;
-  $('projStats').innerHTML = `<div>${p.yrsToRet>0?p.c.retire:ar.age} 歲・${scName}<b>${wan(ar[sk])} 萬</b></div><div>累積已繳<b>${wan(ar.paid)} 萬</b></div><div>${p.retNeed>0?'退休需求':'保守～樂觀'}<b>${p.retNeed>0?wan(p.retNeed)+' 萬':wan(ar.low)+'～'+wan(ar.high)}</b></div>`;
+  $('projStats').innerHTML = `<div>${T('stAt')(p.yrsToRet>0?p.c.retire:ar.age, scName)}<b>${M(ar[sk])}</b></div><div>${T('stPaid')}<b>${M(ar.paid)}</b></div><div>${p.retNeed>0?T('stNeed'):T('stRange')}<b>${p.retNeed>0?M(p.retNeed):M(ar.low)+' – '+M(ar.high)}</b></div>`;
 }
 function chatFor(p){
-  const c=p.c, rec=k=>p.items.find(i=>i.key===k&&(i.status==='in'||i.status==='partial')), m=[];
-  m.push(['u','我住院開刀，保單可以賠哪些？']);
-  m.push(['b', rec('med')?'依您的醫療實支實付：住院自費醫材、病房差額等雜費，限額 30 萬元內實支實付；另有住院日額每日 3,000 元。':c.hasMed?'依您持有的實支實付醫療險，住院雜費與手術費用於條款限額內實支實付。':'目前規劃未含醫療實支實付，住院費用以健保給付為主，建議與您的保險顧問討論。']);
-  const ci=rec('ci'); if (ci){ m.push(['u','如果確診癌症呢？']); m.push(['b',`確診且符合重大傷病條款定義，可一次給付 ${wan(ci.cover)} 萬元。實際以保單條款及理賠審核為準。`]); }
+  const c=p.c, C=T('chat'), rec=k=>p.items.find(i=>i.key===k&&(i.status==='in'||i.status==='partial')), m=[];
+  m.push(['u',C.q1]); m.push(['b', rec('med')?C.a1:c.hasMed?C.a1h:C.a1n]);
+  const ci=rec('ci'); if (ci){ m.push(['u',C.q2]); m.push(['b',C.a2(M(ci.cover))]); }
   return m;
 }
 function renderSvc(p){
   const c=p.c, dyn=$('smartDyn');
   const inPlan=new Set([...p.items.filter(i=>i.status==='in'||i.status==='partial').map(i=>i.key),...['ann','div','inv'].filter(k=>p.sav[k]>0)]);
-  const coverProds = COVER_KEYS.filter(k=>inPlan.has(k)).map(k=>NAMES[k]);
-  if (c.smart==='unknown'){ dyn.innerHTML = `<div class="state">選「需要」後，會列出可在 LINE 查詢保障的壽險公司比較。</div>`; }
-  else if (c.smart==='no'){ dyn.innerHTML = `<div class="state"><span class="dot" style="background:var(--muted);margin-top:6px"></span><span>已記錄：客戶暫不需要。建議於保單生效、寄送保單時再問一次；隨時可改選「需要」。</span></div>`; }
+  const coverProds = COVER_KEYS.filter(k=>inPlan.has(k)).map(k=>NAME(k).toLowerCase ? (EN()?NAME(k).toLowerCase():NAME(k)) : NAME(k));
+  if (c.smart==='unknown') dyn.innerHTML = `<div class="state">${T('smUnkNote')}</div>`;
+  else if (c.smart==='no') dyn.innerHTML = `<div class="state"><span class="dot" style="background:var(--muted);margin-top:6px"></span><span>${T('smNoNote')}</span></div>`;
   else {
-    const ranked = INSURERS.map(x=>({...x, fit: x.cap[0]*2 + x.cap[3] + x.cap[1]*0.5})).sort((a,b)=>b.fit-a.fit);
-    dyn.innerHTML = `<div class="fitbar">依「保障內容可即時說明」排序${coverProds.length?`，對應本次 ${coverProds.join('、')}`:''}：</div>
-      <div class="ins-head"><span style="text-align:left">壽險公司・LINE 服務</span>${COLS.map(x=>`<span>${x}</span>`).join('')}<span></span></div>
-      ${ranked.map((x,i)=>`<div class="ins${i===0&&x.cap[0]?' fit':''}${S.openIns.has(x.name)?' open':''}" data-n="${x.name}">
-        <div class="ins-h"><div class="co">${x.name}<small>${x.bot}</small></div>${x.cap.map(v=>`<span class="mk ${v?'y':'n'}">${v?'●':'○'}</span>`).join('')}${CHEV}</div>
-        <div class="ins-b"><div><b style="color:var(--ink)">管道</b>　${x.ch}</div><div style="margin-top:4px">${x.note}</div><div style="margin-top:4px;color:var(--muted);font-size:12px">來源：${x.src}</div>
-        ${x.cap[0]?`<div class="phone"><div class="phone-h"><b>${x.name}</b>　${x.bot}・依本次配置示意</div><div class="chat">${chatFor(p).map(([w,t])=>`<div class="msg ${w}">${t}</div>`).join('')}</div></div>`:''}</div></div>`).join('')}
-      <div class="foot">● 公開資料明確列出該功能　○ 公開資料未明確列出（不代表沒有）。各公司服務持續更新，建議向客戶說明前以官方資訊確認。</div>`;
+    const ranked = INSURERS.map(x=>({...x, fit:x.cap[0]*2+x.cap[3]+x.cap[1]*0.5})).sort((a,b)=>b.fit-a.fit);
+    const joinP = EN() ? coverProds.join(', ') : coverProds.join('、');
+    dyn.innerHTML = `<div class="fitbar">${T('fitbar')(joinP)}</div>
+      <div class="ins-head"><span style="text-align:left">${T('insHead')}</span>${T('cols').map(x=>`<span>${x}</span>`).join('')}<span></span></div>
+      ${ranked.map((x,i)=>{ const L=x[S.lang]; return `<div class="ins${i===0&&x.cap[0]?' fit':''}${S.openIns.has(x.zh.name)?' open':''}" data-n="${x.zh.name}">
+        <div class="ins-h"><div class="co">${L.name}<small>${L.bot}</small></div>${x.cap.map(v=>`<span class="mk ${v?'y':'n'}">${v?'●':'○'}</span>`).join('')}${CHEV}</div>
+        <div class="ins-b"><div><b style="color:var(--ink)">${T('ch')}</b>　${L.ch}</div><div style="margin-top:4px">${L.note}</div><div style="margin-top:4px;color:var(--muted);font-size:12px">${T('src')}: ${L.src}</div>
+        ${x.cap[0]?`<div class="phone"><div class="phone-h"><b>${L.name}</b>　${L.bot} · ${T('demo')}</div><div class="chat">${chatFor(p).map(([w,t])=>`<div class="msg ${w}">${t}</div>`).join('')}</div></div>`:''}</div></div>`; }).join('')}
+      <div class="foot">${T('insFoot')}</div>`;
     dyn.querySelectorAll('.ins-h').forEach(h=>h.addEventListener('click',()=>{ const n=h.parentElement.dataset.n; S.openIns.has(n)?S.openIns.delete(n):S.openIns.add(n); h.parentElement.classList.toggle('open'); }));
   }
-  $('svcDyn').innerHTML = c.svc.map(k=>{ const s=SVC[k], ap=s.keys.filter(x=>inPlan.has(x)).map(x=>NAMES[x]); return `<div class="crit"><b>${s.t}${ap.length?`<span style="font-weight:400;color:var(--muted);font-size:12.5px">　對應 ${ap.join('、')}</span>`:''}</b>${s.d}</div>`; }).join('');
+  $('svcDyn').innerHTML = c.svc.map(k=>{ const s=SVC[k][S.lang], ap=SVC[k].keys.filter(x=>inPlan.has(x)).map(x=>NAME(x)); return `<div class="crit"><b>${s.t}${ap.length?`<span style="font-weight:400;color:var(--muted);font-size:12.5px">　${T('map')} ${ap.join(EN()?', ':'、')}</span>`:''}</b>${s.d}</div>`; }).join('');
 }
 function renderSummary(p){
-  const c=p.c, L=[], ms={single:'單身',married:'已婚',divorced:'離婚／喪偶'}[c.marital];
-  L.push(`【${c.name}｜保險配置建議】`, `${c.age} 歲・${ms}・子女 ${c.kids} 位・年收入 ${fmt(c.income)} 萬`, `建議年繳約 ${wan(p.total)} 萬元（占年收入 ${fmt(c.income?p.total/c.income*100:0,1)}%，月均約 ${fmt(p.total*10000/12)} 元）`, '', '一、保障規劃');
-  p.items.forEach(i=>{ if (['na','off'].includes(i.status)) return; L.push(`・${NAMES[i.key]}：${i.label} ${wan(i.cover)} ${i.unit}，年繳約 ${wan(i.premium)} 萬${i.status==='deferred'?'（下階段補強）':i.status==='partial'?'（先部分配置）':''}`); });
+  const c=p.c, U=T('sum'), L=[], ms=T('marital')[c.marital];
+  L.push(U.head(c.name), U.prof(c,ms), U.total(p.total, fmt(c.income?p.total/c.income*100:0,1)), '', U.prot);
+  p.items.forEach(i=>{ if (['na','off'].includes(i.status)) return; L.push(U.item(NAME(i.key), T('lab')[i.key], coverTxt(i), M(i.premium), i.status==='deferred'?U.later:i.status==='partial'?U.part:'')); });
   const sv=['ann','div','inv'].filter(k=>p.sav[k]>0); let n=2;
-  if (sv.length){ L.push('','二、儲蓄規劃'); sv.forEach(k=>L.push(`・${NAMES[k]}：年繳 ${wan(p.sav[k])} 萬，繳費 ${p.payY} 年`)); L.push(`・中性情境 ${p.yrsToRet>0?c.retire:c.age+p.H} 歲累積約 ${wan(p.atRet.mid)} 萬元（非保證）`); n=3; }
-  if (p.reserve>0.05) L.push(`・保留彈性預算 ${wan(p.reserve)} 萬`);
+  if (sv.length){ L.push('',U.sav); sv.forEach(k=>L.push(U.savItem(NAME(k), M(p.sav[k]), p.payY))); L.push(U.savMid(p.yrsToRet>0?c.retire:c.age+p.H, M(p.atRet.mid))); n=3; }
+  if (p.reserve>0.05) L.push(U.reserve(M(p.reserve)));
   const svcL=[];
-  if (c.smart==='yes') svcL.push('・客戶希望隨時查詢保障範圍：承保公司優先比較可用 LINE 即時說明保障內容者（如保誠人壽「保寶」）');
-  if (c.smart==='no') svcL.push('・客戶暫不需要 LINE 查詢保障，保單生效時再確認');
-  c.svc.forEach(k=>svcL.push(`・重視${SVC[k].t}`));
-  if (svcL.length){ L.push('',`${['','一','二','三'][n]}、售後服務`); L.push(...svcL); }
-  L.push('','※ 需求分析示意，保費為粗估值；實際以各公司條款、核保結果與正式建議書為準。宣告利率與分紅皆非保證。');
+  if (c.smart==='yes') svcL.push(U.smYes); if (c.smart==='no') svcL.push(U.smNo);
+  c.svc.forEach(k=>svcL.push(U.svcItem(SVC[k][S.lang].t)));
+  if (svcL.length){ L.push('',U.svc(n)); L.push(...svcL); }
+  L.push('', (EN()?'* ':'')+U.note);
   $('summary').textContent = L.join('\n');
 }
-function toast(m){ const el=$('toast'); el.textContent=m; el.style.opacity=1; clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity=0,1700); }
+function toast(msg){ const el=$('toast'); el.textContent=msg; el.style.opacity=1; clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity=0,1700); }
 function goTab(t){ S.tab=t; document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
-  const tb=$('tabs'); if (tb.getBoundingClientRect().top > 2) return; window.scrollTo({top: tb.offsetTop - 4, behavior:'smooth'}); }
+  const tb=$('tabs'); if (tb.getBoundingClientRect().top > 2) return; window.scrollTo({top:tb.offsetTop-4, behavior:'smooth'}); }
 
-/* ===== wiring ===== */
+/* ================= wiring ================= */
 const STORIES = {
+ zh:{
   family:'陳先生 35 歲，已婚，兩個小孩，最小 3 歲，年收入 150 萬，每月開銷 6 萬，房貸 800 萬，存款 200 萬，公司團保壽險 100 萬，想先把家庭和醫療保障補齊，也想存小孩教育金，個性穩健。',
   single:'林小姐 28 歲，單身，上班族，月薪 5 萬，每月開銷 3 萬，存款 50 萬，沒有任何保險，想做醫療保障，也想開始存退休金，可以承受一點波動，希望 60 歲退休，有問題希望能隨時用 LINE 查保障範圍。',
   dink:'王先生 31 歲，新婚，跑外勤業務，年收入 100 萬，每月開銷 5 萬，房貸 600 萬，存款 150 萬，已經有實支實付醫療險，團保壽險 50 萬，想保障家人也存退休金，穩健，理賠希望方便一點。',
   hnw:'張董 55 歲，已婚，小孩都成年了，年收入 300 萬，每月開銷 10 萬，資產 3000 萬，已有醫療險和壽險 500 萬，想做資產傳承跟退休規劃，個性保守，62 歲退休，希望有專人一站式服務。'
+ },
+ en:{
+  family:'Mr. Chen, 35, married with two kids, youngest is 3. Income NT$1.5M a year, spends NT$60k a month, NT$8M mortgage, NT$2M in savings, NT$1M group life cover. Wants to protect the family, cover medical costs and save for the kids’ education. Balanced risk.',
+  single:'Ms. Lin, 28, single, office worker. Salary NT$50k a month, spends NT$30k a month, NT$500k in savings, no insurance. Wants medical cover and to start saving for retirement, can tolerate some volatility, wants to retire at 60, and wants to check coverage anytime on LINE.',
+  dink:'Mr. Wang, 31, newlywed, field sales. Income NT$1M a year, spends NT$50k a month, NT$6M mortgage, NT$1.5M in savings, already has medical insurance, NT$500k group life cover. Wants to protect the family and save for retirement, balanced, wants easy claims.',
+  hnw:'Mr. Chang, 55, married, kids are grown. Income NT$3M a year, spends NT$100k a month, NT$30M in assets, already has medical insurance and NT$5M life cover. Wants legacy and retirement planning, conservative, retiring at 62, wants a dedicated concierge.'
+ }
 };
-$('preset').addEventListener('change',e=>{ const s=STORIES[e.target.value]; if (s){ $('story').value=s; parseAndApply(); window.scrollTo({top:0,behavior:'smooth'}); } e.target.value=''; });
-['f','quick','smartSeg','svcChips','scen'].forEach(id=>{ $(id).addEventListener('change',render); });
+$('preset').addEventListener('change',e=>{ const k=e.target.value; if (STORIES[S.lang][k]){ S.preset=k; $('story').value=STORIES[S.lang][k]; parseAndApply(false); window.scrollTo({top:0,behavior:'smooth'}); } e.target.value=''; });
+['f','quick','smartSeg','svcChips','scen'].forEach(id=>$(id).addEventListener('change',render));
 $('f').addEventListener('input',render);
 $('budgetR').addEventListener('input',e=>{ S.budget=+e.target.value; render(); });
-$('budgetAuto').addEventListener('click',()=>{ S.budget=null; render(); toast('已改用建議預算'); });
-$('smartSeg').addEventListener('change',()=>{ const v=radio('smart'); toast(v==='yes'?'已列出可用 LINE 查保障的壽險公司':v==='no'?'已記錄：客戶暫不需要':'已設為尚未詢問'); });
+$('budgetAuto').addEventListener('click',()=>{ S.budget=null; render(); toast(T('toastSug')); });
+$('smartSeg').addEventListener('change',()=>{ const v=radio('smart'); toast(v==='yes'?T('toastYes'):v==='no'?T('toastNo'):T('toastUnk')); });
+$('langSeg').addEventListener('change',()=>setLang(radio('lang')));
 $('tabs').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.t)));
-$('copyBtn').addEventListener('click',()=>{ const txt=$('summary').textContent, done=()=>toast('已複製建議摘要');
-  const fb=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){toast('請至「摘要」頁長按手動複製');} ta.remove(); };
+$('copyBtn').addEventListener('click',()=>{ const txt=$('summary').textContent, done=()=>toast(T('copied'));
+  const fb=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){toast(T('copyFail'));} ta.remove(); };
   try{ navigator.clipboard.writeText(txt).then(done,fb); }catch(e){ fb(); } });
-$('story').value = STORIES.family;
-parseAndApply();
+window.addEventListener('hashchange',()=>{ const l = location.hash==='#en' ? 'en' : 'zh'; if (l!==S.lang) setLang(l); });
+
+(function init(){
+  let l = 'zh';
+  if (location.hash === '#en') l = 'en';
+  else { try{ const s=localStorage.getItem('advisor-lang'); if (s==='en'||s==='zh') l=s; }catch(e){} }
+  S.lang = l; applyStatic();
+  $('story').value = STORIES[l].family; S.preset='family';
+  parseAndApply(false);
+})();
+
 </script>
 </body>
 </html>
